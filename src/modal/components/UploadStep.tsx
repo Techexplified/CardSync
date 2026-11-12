@@ -21,6 +21,26 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+function UploadIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
 export function UploadStep({
   snapshot,
   snapshotLoading,
@@ -78,19 +98,20 @@ export function UploadStep({
   );
 
   return (
-    <div className="stack-lg">
-      <section className="modal-card">
-        <div className="panel-header" style={{ marginBottom: 8 }}>
-          <div>
-            <h2>Step 1: Board Snapshot &amp; CSV Upload</h2>
-            <p style={{ marginBottom: 0 }}>
-              Export your current board as a template with real Card IDs, or upload
-              an existing spreadsheet to update cards in bulk.
+    <div className="cs-stack-lg">
+      <section className="cs-card">
+        <div className="cs-row">
+          <div style={{ flex: '1 1 320px' }}>
+            <h2 className="cs-card-title">Board Snapshot</h2>
+            <p className="cs-card-desc">
+              Download your board&apos;s cards as a template with real Card IDs, or
+              refresh before importing your updated spreadsheet.
             </p>
           </div>
-          <div className="actions-row">
+          <div className="cs-actions">
             <button
               type="button"
+              className="cs-btn"
               disabled={snapshotLoading}
               onClick={() => void onRefreshBoard()}
             >
@@ -98,6 +119,7 @@ export function UploadStep({
             </button>
             <button
               type="button"
+              className="cs-btn"
               disabled={!snapshot || snapshotLoading}
               onClick={() => snapshot && exportBoardTemplateCsv(snapshot)}
             >
@@ -107,36 +129,54 @@ export function UploadStep({
         </div>
 
         {snapshotError && (
-          <div className="alert-banner alert-error" role="alert">
+          <div
+            className="cs-alert cs-alert-error"
+            role="alert"
+            style={{ marginTop: 12 }}
+          >
             {snapshotError}
           </div>
         )}
 
-        {snapshot && (
-          <div className="stats-grid">
-            <div className="stat-box">
-              <div className="muted-label">Open Cards</div>
-              <div className="stat-value">{snapshot.cards.length}</div>
+        {snapshot ? (
+          <div className="cs-stats-grid">
+            <div className="cs-stat-tile">
+              <div className="cs-label">Open Cards</div>
+              <div className="cs-stat-value">{snapshot.cards.length}</div>
             </div>
-            <div className="stat-box">
-              <div className="muted-label">Lists</div>
-              <div className="stat-value">{snapshot.lists.length}</div>
+            <div className="cs-stat-tile">
+              <div className="cs-label">Lists</div>
+              <div className="cs-stat-value">{snapshot.lists.length}</div>
             </div>
-            <div className="stat-box">
-              <div className="muted-label">Labels</div>
-              <div className="stat-value">{snapshot.labels.length}</div>
+            <div className="cs-stat-tile">
+              <div className="cs-label">Labels</div>
+              <div className="cs-stat-value">{snapshot.labels.length}</div>
             </div>
-            <div className="stat-box">
-              <div className="muted-label">Members</div>
-              <div className="stat-value">{snapshot.members.length}</div>
+            <div className="cs-stat-tile">
+              <div className="cs-label">Members</div>
+              <div className="cs-stat-value">{snapshot.members.length}</div>
             </div>
           </div>
+        ) : (
+          snapshotLoading && (
+            <p className="cs-card-desc" style={{ marginTop: 12 }}>
+              Loading board cards, lists, labels, and members...
+            </p>
+          )
         )}
       </section>
 
-      <section className="modal-card">
+      <section className="cs-card cs-stack-md">
+        <div>
+          <h2 className="cs-card-title">Upload CSV File</h2>
+          <p className="cs-card-desc">
+            Select a spreadsheet containing a Card ID column and the fields you want
+            to update.
+          </p>
+        </div>
+
         <div
-          className={`dropzone ${dragging ? 'dropzone-active' : ''}`}
+          className={`cs-dropzone ${dragging ? 'cs-dropzone-active' : ''}`}
           onDragOver={(e) => {
             e.preventDefault();
             setDragging(true);
@@ -160,42 +200,43 @@ export function UploadStep({
             style={{ display: 'none' }}
             onChange={handleFileChange}
           />
-          <div className="dropzone-title">
+          <div className="cs-dropzone-icon">
+            <UploadIcon />
+          </div>
+          <div className="cs-dropzone-title">
             {parsing
               ? 'Parsing CSV...'
               : csvData
-                ? `Uploaded: ${csvData.fileName} (${formatBytes(csvData.fileSize)})`
-                : 'Drop your .csv file here or click to browse'}
+                ? `${csvData.fileName} (${formatBytes(csvData.fileSize)})`
+                : 'Drop your .csv file here, or click to browse'}
           </div>
-          <div className="dropzone-subtitle">
-            Must contain a Card ID column to match existing Trello cards without
-            duplicates.
+          <div className="cs-dropzone-sub">
+            Supports UTF-8 CSV files with quoted multiline descriptions, due dates,
+            labels, and member usernames.
           </div>
         </div>
 
         {parseError && (
-          <div
-            className="alert-banner alert-error"
-            role="alert"
-            style={{ marginTop: 12 }}
-          >
+          <div className="cs-alert cs-alert-error" role="alert">
             {parseError}
           </div>
         )}
 
         {csvData && (
-          <div className="stack-md" style={{ marginTop: 16 }}>
-            <div className="panel-header">
-              <div className="actions-row">
-                <span className="pill pill-success">
-                  {csvData.rows.length} rows detected
+          <div className="cs-stack-md">
+            <div className="cs-file-bar">
+              <div className="cs-actions">
+                <span className="cs-pill cs-pill-success">
+                  {csvData.rows.length} rows
                 </span>
-                <span className="pill pill-muted">
+                <span className="cs-pill cs-pill-info">
                   {csvData.headers.length} columns
                 </span>
+                <span className="cs-card-desc">{csvData.fileName}</span>
               </div>
               <button
                 type="button"
+                className="cs-btn cs-btn-sm"
                 onClick={() => fileInputRef.current?.click()}
               >
                 Replace CSV
@@ -203,30 +244,30 @@ export function UploadStep({
             </div>
 
             {csvData.duplicateHeaders.length > 0 && (
-              <div className="alert-banner alert-warning">
+              <div className="cs-alert cs-alert-warning">
                 Duplicate column headers detected (auto-renamed):{' '}
                 {csvData.duplicateHeaders.join(', ')}
               </div>
             )}
 
             {csvData.parseWarnings.length > 0 && (
-              <div className="alert-banner alert-warning">
+              <div className="cs-alert cs-alert-warning">
                 CSV parser warnings: {csvData.parseWarnings.slice(0, 3).join(' | ')}
               </div>
             )}
 
             {csvData.rows.length === 0 ? (
-              <div className="alert-banner alert-error">
+              <div className="cs-alert cs-alert-error">
                 This CSV file has headers but no data rows.
               </div>
             ) : (
               <div>
-                <div className="muted-label">
+                <div className="cs-label">
                   Preview (first {Math.min(PREVIEW_ROW_LIMIT, csvData.rows.length)} of{' '}
                   {csvData.rows.length} rows)
                 </div>
-                <div className="table-scroll">
-                  <table className="data-table">
+                <div className="cs-table-wrap">
+                  <table className="cs-table">
                     <thead>
                       <tr>
                         <th>Row</th>
@@ -238,11 +279,11 @@ export function UploadStep({
                     <tbody>
                       {csvData.rows.slice(0, PREVIEW_ROW_LIMIT).map((row) => (
                         <tr key={row.rowNumber}>
-                          <td className="row-num">{row.rowNumber}</td>
+                          <td className="cs-row-num">{row.rowNumber}</td>
                           {csvData.headers.map((header) => (
                             <td key={header} title={row.values[header]}>
                               {row.values[header] || (
-                                <span className="cell-empty">—</span>
+                                <span className="cs-cell-empty">—</span>
                               )}
                             </td>
                           ))}
@@ -254,10 +295,10 @@ export function UploadStep({
               </div>
             )}
 
-            <div className="panel-header" style={{ justifyContent: 'flex-end' }}>
+            <div className="cs-row" style={{ justifyContent: 'flex-end' }}>
               <button
                 type="button"
-                className="mod-primary"
+                className="cs-btn cs-btn-primary"
                 disabled={!canContinue}
                 onClick={onContinue}
               >
@@ -270,4 +311,3 @@ export function UploadStep({
     </div>
   );
 }
-

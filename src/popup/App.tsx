@@ -105,9 +105,9 @@ export function PopupApp() {
 
   if (!t) {
     return (
-      <div className="panel">
-        <p className="panel-title">CardSync Popup</p>
-        <div className="card-box">
+      <div className="cs-scope cs-panel">
+        <p className="cs-panel-title">CardSync Popup</p>
+        <div className="cs-subbox">
           Open this view from inside a Trello board or card to connect to the Trello
           Power-Up client.
         </div>
@@ -117,41 +117,43 @@ export function PopupApp() {
 
   if (loading) {
     return (
-      <div className="panel">
-        <div className="card-box">Loading Trello context...</div>
+      <div className="cs-scope cs-panel">
+        <div className="cs-subbox">Loading Trello context...</div>
       </div>
     );
   }
 
   return (
-    <div className="panel">
-      <div className="panel-header">
-        <h2 className="panel-title">
+    <div className="cs-scope cs-panel">
+      <div className="cs-row">
+        <h2 className="cs-panel-title">
           {view === 'board' ? 'Board Connection' : 'Card Sync Status'}
         </h2>
-        <span className="pill pill-success">Connected</span>
+        <span className="cs-pill cs-pill-success">Connected</span>
       </div>
 
-      <div className="card-box">
-        <div className="muted-label">Board</div>
+      <div className="cs-subbox">
+        <div className="cs-label">Board</div>
         <div>{board?.name ?? 'Unknown board'}</div>
       </div>
 
       {view === 'card' && card && (
-        <div className="card-box">
-          <div className="muted-label">Card</div>
-          <div style={{ marginBottom: 8 }}>{card.name}</div>
-          <div className="panel-header">
+        <div className="cs-subbox cs-stack-sm">
+          <div>
+            <div className="cs-label">Card</div>
+            <div>{card.name}</div>
+          </div>
+          <div className="cs-row">
             <span
-              className={`pill ${
-                cardState?.synced ? 'pill-success' : 'pill-muted'
+              className={`cs-pill ${
+                cardState?.synced ? 'cs-pill-success' : 'cs-pill-muted'
               }`}
             >
               {cardState?.synced ? settings.defaultLabel || 'Synced' : 'Not synced'}
             </span>
             <button
               type="button"
-              className="mod-primary"
+              className="cs-btn cs-btn-primary cs-btn-sm"
               disabled={saving}
               onClick={() => void toggleCardSync()}
             >
@@ -166,18 +168,28 @@ export function PopupApp() {
       )}
 
       {view === 'board' && (
-        <div className="card-box">
-          <div className="muted-label">Card Badges</div>
-          <div style={{ marginBottom: 8 }}>
-            Badges are currently{' '}
-            <strong>{settings.showBadges ? 'enabled' : 'disabled'}</strong> (label:{' '}
-            <code>{settings.defaultLabel}</code>).
+        <div className="cs-subbox cs-stack-sm">
+          <div>
+            <div className="cs-label">Card Badges</div>
+            <div>
+              Badges are currently{' '}
+              <strong>{settings.showBadges ? 'enabled' : 'disabled'}</strong>{' '}
+              (label: <code>{settings.defaultLabel}</code>).
+            </div>
           </div>
-          <div className="actions-row">
-            <button type="button" onClick={() => void openSettings()}>
+          <div className="cs-actions">
+            <button
+              type="button"
+              className="cs-btn cs-btn-sm"
+              onClick={() => void openSettings()}
+            >
               Open Settings
             </button>
-            <button type="button" onClick={() => void t.closePopup()}>
+            <button
+              type="button"
+              className="cs-btn cs-btn-subtle cs-btn-sm"
+              onClick={() => void t.closePopup()}
+            >
               Close
             </button>
           </div>
@@ -186,4 +198,3 @@ export function PopupApp() {
     </div>
   );
 }
-

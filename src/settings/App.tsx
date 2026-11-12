@@ -69,8 +69,8 @@ export function SettingsApp() {
 
   if (!t) {
     return (
-      <div className="panel">
-        <div className="card-box">
+      <div className="cs-scope cs-panel">
+        <div className="cs-subbox">
           Open Settings from the CardSync Power-Up menu inside Trello.
         </div>
       </div>
@@ -79,17 +79,17 @@ export function SettingsApp() {
 
   if (loading) {
     return (
-      <div className="panel">
-        <div className="card-box">Loading settings...</div>
+      <div className="cs-scope cs-panel">
+        <div className="cs-subbox">Loading settings...</div>
       </div>
     );
   }
 
   return (
-    <form className="panel" onSubmit={(e) => void handleSave(e)}>
-      <h2 className="panel-title">CardSync Settings</h2>
+    <form className="cs-scope cs-panel" onSubmit={(e) => void handleSave(e)}>
+      <h2 className="cs-panel-title">CardSync Settings</h2>
 
-      <label className="checkbox-row">
+      <label className="cs-checkbox">
         <input
           type="checkbox"
           checked={showBadges}
@@ -99,9 +99,9 @@ export function SettingsApp() {
       </label>
 
       <div>
-        <div className="muted-label">Badge Label</div>
+        <div className="cs-label">Badge Label</div>
         <input
-          className="input-field"
+          className="cs-input"
           type="text"
           value={defaultLabel}
           maxLength={24}
@@ -110,15 +110,22 @@ export function SettingsApp() {
         />
       </div>
 
-      <div className="actions-row">
-        <button type="submit" className="mod-primary" disabled={saving}>
+      <div className="cs-actions">
+        <button
+          type="submit"
+          className="cs-btn cs-btn-primary cs-btn-sm"
+          disabled={saving}
+        >
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
-        <button type="button" onClick={() => void t.closePopup()}>
+        <button
+          type="button"
+          className="cs-btn cs-btn-sm"
+          onClick={() => void t.closePopup()}
+        >
           Cancel
         </button>
       </div>
     </form>
   );
 }
-

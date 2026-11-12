@@ -22,15 +22,23 @@ export function StatusApp() {
   }
 
   return (
-    <main className="status-page">
-      <section className="status-container">
-        <div className="panel-header" style={{ marginBottom: 12 }}>
-          <h1>CardSync Power-Up</h1>
+    <main className="cs-scope cs-status-page">
+      <section className="cs-card cs-status-container cs-stack-md">
+        <div className="cs-row">
+          <div>
+            <h1 className="cs-brand-title" style={{ fontSize: 22 }}>
+              CardSync Power-Up
+            </h1>
+            <p className="cs-card-desc" style={{ marginTop: 4 }}>
+              Bulk update existing Trello cards from CSV uploads without creating
+              duplicates.
+            </p>
+          </div>
           <span
-            className={`pill ${
+            className={`cs-pill ${
               sdkLoaded && isHttps && appKeyConfigured
-                ? 'pill-success'
-                : 'pill-warning'
+                ? 'cs-pill-success'
+                : 'cs-pill-warning'
             }`}
           >
             {sdkLoaded && isHttps && appKeyConfigured
@@ -39,45 +47,51 @@ export function StatusApp() {
           </span>
         </div>
 
-        <p>
-          CardSync updates existing Trello cards in bulk from CSV uploads without
-          creating duplicates.
-        </p>
-
-        <div className="muted-label">Iframe Connector URL</div>
-        <div className="code-row">
-          <span>{connectorUrl}</span>
-          <button type="button" onClick={() => void copyUrl()}>
-            {copied ? 'Copied!' : 'Copy URL'}
-          </button>
+        <div>
+          <div className="cs-label">Iframe Connector URL</div>
+          <div className="cs-code-row">
+            <span>{connectorUrl}</span>
+            <button
+              type="button"
+              className="cs-btn cs-btn-sm"
+              onClick={() => void copyUrl()}
+            >
+              {copied ? 'Copied!' : 'Copy URL'}
+            </button>
+          </div>
         </div>
 
-        <div className="card-box" style={{ marginTop: 16 }}>
-          <div className="muted-label">Environment Checks</div>
-          <div>HTTPS enabled: {isHttps ? 'Yes' : 'No (Trello requires HTTPS)'}</div>
+        <div className="cs-subbox cs-stack-sm">
+          <div className="cs-label">Environment Checks</div>
           <div>
-            Trello Power-Up Client SDK: {sdkLoaded ? 'Loaded' : 'Not detected'}
+            HTTPS enabled: <strong>{isHttps ? 'Yes' : 'No (Trello requires HTTPS)'}</strong>
+          </div>
+          <div>
+            Trello Power-Up Client SDK:{' '}
+            <strong>{sdkLoaded ? 'Loaded' : 'Not detected'}</strong>
           </div>
           <div>
             Trello API Key (<code>VITE_TRELLO_APP_KEY</code>):{' '}
-            {appKeyConfigured
-              ? 'Configured'
-              : 'Not set (required for REST API authorization)'}
+            <strong>
+              {appKeyConfigured
+                ? 'Configured'
+                : 'Not set (required for REST API authorization)'}
+            </strong>
           </div>
         </div>
 
-        <div style={{ marginTop: 18 }}>
-          <div className="muted-label">Capabilities to Enable in Trello Admin Portal</div>
-          <div className="badge-list">
+        <div>
+          <div className="cs-label">Capabilities to Enable in Trello Admin Portal</div>
+          <div className="cs-actions" style={{ marginTop: 6 }}>
             {CAPABILITIES.map((cap) => (
-              <span key={cap} className="pill pill-muted">
+              <span key={cap} className="cs-pill cs-pill-muted">
                 {cap}
               </span>
             ))}
           </div>
         </div>
 
-        <ol className="step-list">
+        <ol className="cs-step-list">
           <li>
             Open{' '}
             <a
