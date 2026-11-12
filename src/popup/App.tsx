@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { getTrelloInitOptions } from '../config/trello';
 import type {
   CardSyncCardState,
   CardSyncSettings,
@@ -19,7 +20,9 @@ export function PopupApp() {
   }, []);
 
   const [t] = useState<TrelloClient | null>(() =>
-    window.TrelloPowerUp ? window.TrelloPowerUp.iframe() : null
+    window.TrelloPowerUp
+      ? window.TrelloPowerUp.iframe(getTrelloInitOptions())
+      : null
   );
   const [board, setBoard] = useState<TrelloBoard | null>(null);
   const [card, setCard] = useState<TrelloCard | null>(null);

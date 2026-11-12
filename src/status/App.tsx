@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { hasTrelloAppKey } from '../config/trello';
 
 const CAPABILITIES = [
   'board-buttons',
@@ -12,6 +13,7 @@ export function StatusApp() {
   const connectorUrl = `${window.location.origin}/`;
   const sdkLoaded = Boolean(window.TrelloPowerUp);
   const isHttps = window.location.protocol === 'https:';
+  const appKeyConfigured = hasTrelloAppKey();
 
   async function copyUrl() {
     await navigator.clipboard.writeText(connectorUrl);
@@ -24,15 +26,22 @@ export function StatusApp() {
       <section className="status-container">
         <div className="panel-header" style={{ marginBottom: 12 }}>
           <h1>CardSync Power-Up</h1>
-          <span className={`pill ${sdkLoaded && isHttps ? 'pill-success' : 'pill-muted'}`}>
-            {sdkLoaded && isHttps ? 'Ready for Trello' : 'Check Setup'}
+          <span
+            className={`pill ${
+              sdkLoaded && isHttps && appKeyConfigured
+                ? 'pill-success'
+                : 'pill-warning'
+            }`}
+          >
+            {sdkLoaded && isHttps && appKeyConfigured
+              ? 'Ready for Trello'
+              : 'Setup Needed'}
           </span>
         </div>
 
         <p>
-          Your Vite + React + TypeScript connector is running. If you accepted the
-          local HTTPS certificate in this browser, Trello can now load this Power-Up
-          inside its iframe.
+          CardSync updates existing Trello cards in bulk from CSV uploads without
+          creating duplicates.
         </p>
 
         <div className="muted-label">Iframe Connector URL</div>
@@ -48,6 +57,12 @@ export function StatusApp() {
           <div>HTTPS enabled: {isHttps ? 'Yes' : 'No (Trello requires HTTPS)'}</div>
           <div>
             Trello Power-Up Client SDK: {sdkLoaded ? 'Loaded' : 'Not detected'}
+          </div>
+          <div>
+            Trello API Key (<code>VITE_TRELLO_APP_KEY</code>):{' '}
+            {appKeyConfigured
+              ? 'Configured'
+              : 'Not set (required for REST API authorization)'}
           </div>
         </div>
 
@@ -78,6 +93,11 @@ export function StatusApp() {
             Paste <code>{connectorUrl}</code> into <strong>Iframe connector URL</strong>.
           </li>
           <li>
+            In <strong>API Key</strong>, generate an API key, add{' '}
+            <code>{window.location.origin}</code> to <strong>Allowed Origins</strong>,
+            and set <code>VITE_TRELLO_APP_KEY</code> in Vercel Environment Variables.
+          </li>
+          <li>
             In <strong>Capabilities</strong>, turn on the 4 capabilities listed above.
           </li>
           <li>
@@ -89,4 +109,3 @@ export function StatusApp() {
     </main>
   );
 }
-

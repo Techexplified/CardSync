@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { getTrelloInitOptions } from '../config/trello';
 import type { CardSyncSettings, TrelloClient } from '../types/trello';
 
 const DEFAULT_SETTINGS: CardSyncSettings = {
@@ -8,7 +9,9 @@ const DEFAULT_SETTINGS: CardSyncSettings = {
 
 export function SettingsApp() {
   const [t] = useState<TrelloClient | null>(() =>
-    window.TrelloPowerUp ? window.TrelloPowerUp.iframe() : null
+    window.TrelloPowerUp
+      ? window.TrelloPowerUp.iframe(getTrelloInitOptions())
+      : null
   );
   const [showBadges, setShowBadges] = useState(true);
   const [defaultLabel, setDefaultLabel] = useState('Synced');

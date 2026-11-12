@@ -50,6 +50,11 @@ body {
   color: #1f845a;
 }
 
+.pill-warning {
+  background: #fff7d6;
+  color: #974f0c;
+}
+
 .pill-muted {
   background: #f1f2f4;
   color: #44546f;
@@ -150,3 +155,90 @@ body {
   margin-top: 8px;
 }
 
+.modal-shell {
+  min-height: 100vh;
+  background: #f4f5f7;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-topbar {
+  background: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.modal-heading {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-subtext {
+  font-size: 13px;
+  color: #44546f;
+  margin-top: 2px;
+}
+
+.wizard-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.wizard-step {
+  background: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #626f86;
+  text-align: center;
+}
+
+.wizard-step-active {
+  border-color: #0c66e4;
+  background: #e9f2ff;
+  color: #0c66e4;
+}
+
+.modal-card {
+  background: #ffffff;
+  border: 1px solid #dfe1e6;
+  border-radius: 8px;
+  padding: 22px;
+}
+
+.modal-card h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.modal-card p {
+  margin: 0 0 14px;
+  color: #44546f;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.alert-banner {
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.alert-error {
+  background: #ffeceb;
+  border: 1px solid #ffd5d2;
+  color: #ae2e24;
+}

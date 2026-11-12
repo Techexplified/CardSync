@@ -13,6 +13,23 @@ export type TrelloColor =
 export type TrelloScope = 'board' | 'card' | 'member' | 'organization';
 export type TrelloVisibility = 'shared' | 'private';
 
+export interface TrelloInitOptions {
+  appKey: string;
+  appName: string;
+}
+
+export interface TrelloAuthorizeOptions {
+  scope: 'read' | 'write' | 'read,write';
+  expiration?: '1hour' | '1day' | '30days' | 'never';
+}
+
+export interface TrelloRestApi {
+  isAuthorized: () => Promise<boolean>;
+  authorize: (options: TrelloAuthorizeOptions) => Promise<void>;
+  getToken: () => Promise<string | null>;
+  clearToken: () => Promise<void>;
+}
+
 export interface TrelloBoard {
   id: string;
   name: string;
@@ -21,10 +38,21 @@ export interface TrelloBoard {
 
 export interface TrelloCard {
   id: string;
+  idShort?: number;
+  shortLink?: string;
   name: string;
   desc?: string;
+  due?: string | null;
   idList?: string;
+  idLabels?: string[];
+  idMembers?: string[];
   url?: string;
+}
+
+export interface TrelloMemberProfile {
+  id: string;
+  fullName: string;
+  username: string;
 }
 
 export interface TrelloPopupOptions {
@@ -71,6 +99,7 @@ export interface TrelloCardBadge {
 export interface TrelloClient {
   board: (...fields: string[]) => Promise<TrelloBoard>;
   card: (...fields: string[]) => Promise<TrelloCard>;
+  cards: (...fields: string[]) => Promise<TrelloCard[]>;
   get: <T = unknown>(
     scope: TrelloScope,
     visibility: TrelloVisibility,
@@ -95,6 +124,7 @@ export interface TrelloClient {
   sizeTo: (selector: string | HTMLElement) => Promise<void>;
   arg: <T = unknown>(name: string, defaultValue?: T) => T;
   signUrl: (url: string) => string;
+  getRestApi: () => TrelloRestApi;
 }
 
 export interface TrelloCapabilityHandlers {
@@ -114,8 +144,11 @@ export interface TrelloCapabilityHandlers {
 }
 
 export interface TrelloPowerUpGlobal {
-  initialize: (handlers: TrelloCapabilityHandlers) => void;
-  iframe: () => TrelloClient;
+  initialize: (
+    handlers: TrelloCapabilityHandlers,
+    options?: TrelloInitOptions
+  ) => void;
+  iframe: (options?: TrelloInitOptions) => TrelloClient;
 }
 
 export interface CardSyncSettings {
@@ -133,4 +166,3 @@ declare global {
     TrelloPowerUp?: TrelloPowerUpGlobal;
   }
 }
-
