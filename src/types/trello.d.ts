@@ -36,6 +36,23 @@ export interface TrelloBoard {
   url?: string;
 }
 
+export interface TrelloList {
+  id: string;
+  name: string;
+}
+
+export interface TrelloLabel {
+  id: string;
+  name: string;
+  color: string | null;
+}
+
+export interface TrelloBoardMember {
+  id: string;
+  fullName: string;
+  username: string;
+}
+
 export interface TrelloCard {
   id: string;
   idShort?: number;
@@ -47,6 +64,15 @@ export interface TrelloCard {
   idLabels?: string[];
   idMembers?: string[];
   url?: string;
+}
+
+export interface BoardSnapshot {
+  board: TrelloBoard;
+  cards: TrelloCard[];
+  lists: TrelloList[];
+  labels: TrelloLabel[];
+  members: TrelloBoardMember[];
+  fetchedAt: string;
 }
 
 export interface TrelloMemberProfile {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getTrelloInitOptions } from '../config/trello';
 import {
   authorizeTrello,
@@ -6,7 +6,10 @@ import {
   getAuthStatus,
   type AuthStatus,
 } from '../services/trelloAuth';
-import type { TrelloBoard, TrelloClient } from '../types/trello';
+import { fetchBoardSnapshot } from '../services/trelloBoard';
+import type { ParsedCsvData } from '../types/cardsync';
+import type { BoardSnapshot, TrelloBoard, TrelloClient } from '../types/trello';
+import { UploadStep } from './components/UploadStep';
 
 const WIZARD_STEPS = [
   '1. CSV Upload',
@@ -28,6 +31,30 @@ export function ModalApp() {
   const [authorizing, setAuthorizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [activeStep, setActiveStep] = useState(0);
+  const [snapshot, setSnapshot] = useState<BoardSnapshot | null>(null);
+  const [snapshotLoading, setSnapshotLoading] = useState(false);
+  const [snapshotError, setSnapshotError] = useState<string | null>(null);
+  const [csvData, setCsvData] = useState<ParsedCsvData | null>(null);
+
+  const loadBoardData = useCallback(
+    async (boardData: TrelloBoard, token: string) => {
+      setSnapshotLoading(true);
+      setSnapshotError(null);
+      try {
+        const nextSnapshot = await fetchBoardSnapshot(boardData, token);
+        setSnapshot(nextSnapshot);
+      } catch (err) {
+        setSnapshotError(
+          err instanceof Error ? err.message : 'Failed to load Trello board data.'
+        );
+      } finally {
+        setSnapshotLoading(false);
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     if (!t) return;
     let cancelled = false;
@@ -42,6 +69,10 @@ export function ModalApp() {
         if (cancelled) return;
         setBoard(boardData);
         setAuth(authStatus);
+
+        if (authStatus.state === 'authorized') {
+          void loadBoardData(boardData, authStatus.token);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -59,7 +90,7 @@ export function ModalApp() {
     return () => {
       cancelled = true;
     };
-  }, [t]);
+  }, [t, loadBoardData]);
 
   async function handleAuthorize() {
     if (!t || authorizing) return;
@@ -72,6 +103,9 @@ export function ModalApp() {
         member: result.member,
         token: result.token,
       });
+      if (board) {
+        void loadBoardData(board, result.token);
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -87,6 +121,14 @@ export function ModalApp() {
     if (!t) return;
     await disconnectTrello(t);
     setAuth({ state: 'unauthorized' });
+    setSnapshot(null);
+    setCsvData(null);
+    setActiveStep(0);
+  }
+
+  async function handleRefreshBoard() {
+    if (!board || auth?.state !== 'authorized') return;
+    await loadBoardData(board, auth.token);
   }
 
   if (!t) {
@@ -141,9 +183,11 @@ export function ModalApp() {
           <div
             key={step}
             className={`wizard-step ${
-              auth?.state === 'authorized' && index === 0
+              auth?.state === 'authorized' && index === activeStep
                 ? 'wizard-step-active'
-                : ''
+                : auth?.state === 'authorized' && index < activeStep
+                  ? 'wizard-step-done'
+                  : ''
             }`}
           >
             {step}
@@ -189,8 +233,8 @@ export function ModalApp() {
             </li>
             <li>
               Copy your API Key into <code>VITE_TRELLO_APP_KEY</code> in{' '}
-              <strong>Vercel Project Settings → Environment Variables</strong> (and{' '}
-              <code>.env</code> locally), then redeploy.
+              <strong>Vercel Project Settings → Environment Variables</strong> (with
+              Config visibility), then redeploy.
             </li>
           </ol>
         </section>
@@ -221,27 +265,33 @@ export function ModalApp() {
         </section>
       )}
 
-      {!loading && auth?.state === 'authorized' && (
+      {!loading && auth?.state === 'authorized' && activeStep === 0 && (
+        <UploadStep
+          snapshot={snapshot}
+          snapshotLoading={snapshotLoading}
+          snapshotError={snapshotError}
+          csvData={csvData}
+          onRefreshBoard={handleRefreshBoard}
+          onCsvLoaded={(data) => setCsvData(data)}
+          onContinue={() => setActiveStep(1)}
+        />
+      )}
+
+      {!loading && auth?.state === 'authorized' && activeStep === 1 && csvData && (
         <section className="modal-card">
           <div className="panel-header" style={{ marginBottom: 8 }}>
-            <h2 style={{ margin: 0 }}>Trello Connection Ready</h2>
-            <span className="pill pill-success">Feature A Complete</span>
+            <h2 style={{ margin: 0 }}>Step 2: Column Mapping</h2>
+            <button type="button" onClick={() => setActiveStep(0)}>
+              &larr; Back to CSV Upload
+            </button>
           </div>
           <p>
-            Authenticated as <strong>{auth.member.fullName}</strong> (
-            <code>@{auth.member.username}</code>) on board{' '}
-            <strong>{board?.name}</strong>.
+            CSV loaded (<strong>{csvData.fileName}</strong>,{' '}
+            {csvData.rows.length} rows, {csvData.headers.length} columns). Ready to
+            implement <strong>Feature C (Column Mapping)</strong> next.
           </p>
-          <div className="card-box">
-            <div className="muted-label">Next Step</div>
-            <div>
-              Ready to wire up <strong>Step 1: CSV Upload &amp; Board Export Template</strong>{' '}
-              and the card matching / validation pipeline.
-            </div>
-          </div>
         </section>
       )}
     </main>
   );
 }
-
