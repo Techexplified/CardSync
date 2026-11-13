@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getTrelloInitOptions } from '../config/trello';
 import {
   authorizeTrello,
   buildTrelloAuthUrl,
@@ -42,12 +41,12 @@ function SyncLogoIcon() {
   );
 }
 
-export function ModalApp() {
-  const [t] = useState<TrelloClient | null>(() =>
-    window.TrelloPowerUp
-      ? window.TrelloPowerUp.iframe(getTrelloInitOptions())
-      : null
-  );
+interface ModalAppProps {
+  trelloClient: TrelloClient | null;
+}
+
+export function ModalApp({ trelloClient }: ModalAppProps) {
+  const t = trelloClient;
   const [board, setBoard] = useState<TrelloBoard | null>(null);
   const [auth, setAuth] = useState<AuthStatus | null>(null);
   const [loading, setLoading] = useState(() => Boolean(window.TrelloPowerUp));
