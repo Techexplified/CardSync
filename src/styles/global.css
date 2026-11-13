@@ -684,30 +684,113 @@ body {
   border-style: dashed;
 }
 
-/* Radio / Mode Segment Controls */
-.cs-radio-group {
-  display: inline-flex;
+/* Sync Option Cards (Merge vs Replace) */
+.cs-sync-card {
+  background: var(--cs-surface);
   border: 1px solid var(--cs-border);
-  border-radius: 6px;
-  overflow: hidden;
-  background: #ffffff;
+  border-radius: 8px;
+  padding: 14px 16px;
 }
 
-.cs-radio-btn {
-  padding: 6px 12px;
-  font-size: 12.5px;
-  font-weight: 500;
-  border: none;
-  background: transparent;
+.cs-sync-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--cs-text);
+  margin-bottom: 2px;
+}
+
+.cs-sync-desc {
+  font-size: 12px;
   color: var(--cs-text-secondary);
+  margin-bottom: 10px;
+}
+
+.cs-sync-options-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .cs-sync-options-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cs-sync-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--cs-border);
+  border-radius: 7px;
+  background: #ffffff;
   cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  user-select: none;
+  width: 100%;
+}
+
+.cs-sync-choice:hover {
+  border-color: #85b8ff;
+  background: #f8fbff;
+}
+
+.cs-sync-choice-active {
+  border-color: var(--cs-primary) !important;
+  background: #f0f7ff !important;
+}
+
+.cs-sync-radio-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cs-border-strong);
+  margin-top: 1px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
 }
 
-.cs-radio-btn-active {
+.cs-sync-choice-active .cs-sync-radio-dot {
+  border-color: var(--cs-primary);
   background: var(--cs-primary);
-  color: #ffffff;
+}
+
+.cs-sync-radio-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.cs-sync-choice-label {
+  font-size: 13px;
   font-weight: 600;
+  color: var(--cs-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cs-sync-badge-rec {
+  background: #dcfff1;
+  color: #1f845a;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.cs-sync-choice-detail {
+  font-size: 11.5px;
+  color: var(--cs-text-secondary);
+  margin-top: 2px;
+  line-height: 1.4;
 }
 
 .cs-mapping-header-pill {

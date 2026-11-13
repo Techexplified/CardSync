@@ -269,63 +269,110 @@ export function MappingStep({
         </table>
       </div>
 
-      {/* Mode Settings for Labels & Members */}
+      {/* Settings for Labels & Members */}
       {(hasLabelsMapped || hasMembersMapped) && (
-        <div className="cs-subbox cs-stack-sm" style={{ marginTop: 4 }}>
-          <div className="cs-label">Multi-Value Sync Settings</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+        <div className="cs-stack-sm" style={{ marginTop: 4 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 14 }}>
             {hasLabelsMapped && (
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-                  Labels Update Mode
+              <div className="cs-sync-card">
+                <div className="cs-sync-title">🏷️ Labels Update Behavior</div>
+                <div className="cs-sync-desc">
+                  Choose how labels from your spreadsheet affect existing card labels:
                 </div>
-                <div className="cs-radio-group">
-                  <button
-                    type="button"
-                    className={`cs-radio-btn ${
-                      mappingConfig.labelsMode === 'append' ? 'cs-radio-btn-active' : ''
+                <div className="cs-sync-options-row">
+                  <div
+                    className={`cs-sync-choice ${
+                      mappingConfig.labelsMode === 'append' ? 'cs-sync-choice-active' : ''
                     }`}
                     onClick={() => handleLabelsModeChange('append')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLabelsModeChange('append')}
                   >
-                    Merge (Keep existing + add new)
-                  </button>
-                  <button
-                    type="button"
-                    className={`cs-radio-btn ${
-                      mappingConfig.labelsMode === 'replace' ? 'cs-radio-btn-active' : ''
+                    <div className="cs-sync-radio-dot">
+                      {mappingConfig.labelsMode === 'append' && <div className="cs-sync-radio-inner" />}
+                    </div>
+                    <div>
+                      <div className="cs-sync-choice-label">
+                        Merge <span className="cs-sync-badge-rec">Recommended</span>
+                      </div>
+                      <div className="cs-sync-choice-detail">
+                        Keep existing labels and add new ones from CSV.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`cs-sync-choice ${
+                      mappingConfig.labelsMode === 'replace' ? 'cs-sync-choice-active' : ''
                     }`}
                     onClick={() => handleLabelsModeChange('replace')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLabelsModeChange('replace')}
                   >
-                    Replace all existing
-                  </button>
+                    <div className="cs-sync-radio-dot">
+                      {mappingConfig.labelsMode === 'replace' && <div className="cs-sync-radio-inner" />}
+                    </div>
+                    <div>
+                      <div className="cs-sync-choice-label">Replace All</div>
+                      <div className="cs-sync-choice-detail">
+                        Remove old labels and set only the ones from CSV.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
             {hasMembersMapped && (
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-                  Members (Assignees) Mode
+              <div className="cs-sync-card">
+                <div className="cs-sync-title">👤 Members (Assignees) Behavior</div>
+                <div className="cs-sync-desc">
+                  Choose how assignees from your spreadsheet affect existing card members:
                 </div>
-                <div className="cs-radio-group">
-                  <button
-                    type="button"
-                    className={`cs-radio-btn ${
-                      mappingConfig.membersMode === 'append' ? 'cs-radio-btn-active' : ''
+                <div className="cs-sync-options-row">
+                  <div
+                    className={`cs-sync-choice ${
+                      mappingConfig.membersMode === 'append' ? 'cs-sync-choice-active' : ''
                     }`}
                     onClick={() => handleMembersModeChange('append')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleMembersModeChange('append')}
                   >
-                    Merge (Keep existing + add new)
-                  </button>
-                  <button
-                    type="button"
-                    className={`cs-radio-btn ${
-                      mappingConfig.membersMode === 'replace' ? 'cs-radio-btn-active' : ''
+                    <div className="cs-sync-radio-dot">
+                      {mappingConfig.membersMode === 'append' && <div className="cs-sync-radio-inner" />}
+                    </div>
+                    <div>
+                      <div className="cs-sync-choice-label">
+                        Merge <span className="cs-sync-badge-rec">Recommended</span>
+                      </div>
+                      <div className="cs-sync-choice-detail">
+                        Keep current assignees and add new ones from CSV.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`cs-sync-choice ${
+                      mappingConfig.membersMode === 'replace' ? 'cs-sync-choice-active' : ''
                     }`}
                     onClick={() => handleMembersModeChange('replace')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleMembersModeChange('replace')}
                   >
-                    Replace all existing
-                  </button>
+                    <div className="cs-sync-radio-dot">
+                      {mappingConfig.membersMode === 'replace' && <div className="cs-sync-radio-inner" />}
+                    </div>
+                    <div>
+                      <div className="cs-sync-choice-label">Replace All</div>
+                      <div className="cs-sync-choice-detail">
+                        Unassign everyone and assign only members from CSV.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
