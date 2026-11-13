@@ -54,11 +54,13 @@ function buildBoardIndexes(snapshot: BoardSnapshot) {
   const labelByName = new Map<string, string>(); // name (lowercase) → label id
   const memberByUsername = new Map<string, string>(); // username (lowercase) → member id
   const memberByFullName = new Map<string, string>(); // fullname (lowercase) → member id
+  const cardByName = new Map<string, TrelloCard>(); // name (lowercase) → card
 
   for (const card of snapshot.cards) {
     cardById.set(card.id, card);
     if (card.shortLink) cardByShortLink.set(card.shortLink, card);
     if (card.idShort !== undefined) cardByShortId.set(card.idShort, card);
+    if (card.name) cardByName.set(card.name.toLowerCase().trim(), card);
   }
   for (const list of snapshot.lists) {
     listByName.set(list.name.toLowerCase().trim(), list.id);
@@ -81,6 +83,7 @@ function buildBoardIndexes(snapshot: BoardSnapshot) {
     cardById,
     cardByShortLink,
     cardByShortId,
+    cardByName,
     listByName,
     listById,
     labelByName,
@@ -89,8 +92,13 @@ function buildBoardIndexes(snapshot: BoardSnapshot) {
   };
 }
 
+/** Clean duplicate header suffixes like `(2)` or `(2) (2)` for human presentation */
+export function cleanHeaderLabel(raw: string): string {
+  return raw.replace(/\s*\(\d+\)/g, '').trim();
+}
+
 /**
- * Extracts a card identifier from a raw value (ID, short ID, URL, or shortLink).
+ * Extracts a card identifier from a raw value (ID, short ID, URL, shortLink, or exact Card Name).
  */
 function resolveCardFromRaw(
   raw: string,
@@ -99,12 +107,12 @@ function resolveCardFromRaw(
   const trimmed = raw.trim();
   if (!trimmed) return null;
 
-  // 24-char hex ID
+  // 1. 24-char hex ID
   if (/^[a-f0-9]{24}$/i.test(trimmed)) {
     return indexes.cardById.get(trimmed) ?? null;
   }
 
-  // Trello card URL — extract shortLink or shortId
+  // 2. Trello card URL — extract shortLink or shortId
   const urlMatch = trimmed.match(/trello\.com\/c\/([a-zA-Z0-9]+)(?:\/(\d+))?/);
   if (urlMatch) {
     const byShortLink = indexes.cardByShortLink.get(urlMatch[1]);
@@ -115,16 +123,22 @@ function resolveCardFromRaw(
     }
   }
 
-  // 8-char shortLink
+  // 3. 8-char shortLink
   if (/^[a-zA-Z0-9]{8}$/.test(trimmed)) {
     const byShortLink = indexes.cardByShortLink.get(trimmed);
     if (byShortLink) return byShortLink;
   }
 
-  // Numeric card # (with or without #)
+  // 4. Numeric card # (with or without #)
   const numMatch = trimmed.match(/^#?(\d+)$/);
   if (numMatch) {
     return indexes.cardByShortId.get(Number(numMatch[1])) ?? null;
+  }
+
+  // 5. Fallback: match by exact card title (case-insensitive)
+  const byName = indexes.cardByName.get(trimmed.toLowerCase());
+  if (byName) {
+    return byName;
   }
 
   return null;
@@ -146,46 +160,57 @@ function validateRow(
     ([, field]) => field === 'id'
   )?.[0] ?? null;
 
+  const cleanIdLabel = idHeader ? cleanHeaderLabel(idHeader) : 'Card ID';
+
   // --- Card Matching ---
   if (idHeader) {
     const rawId = row.values[idHeader] ?? '';
     if (!rawId.trim()) {
       issues.push({
-        field: idHeader,
-        message: 'Card identifier is blank — this row cannot be matched to a card.',
+        field: cleanIdLabel,
+        message: 'Identifier is blank — cannot match this row to a card.',
         severity: 'error',
       });
     } else {
       matchedCard = resolveCardFromRaw(rawId, indexes);
       if (!matchedCard) {
         issues.push({
-          field: idHeader,
-          message: `No card found on this board matching "${rawId}". Check the Card ID, card number, or URL.`,
+          field: cleanIdLabel,
+          message: `No card on this board matches "${rawId}".`,
           severity: 'error',
         });
       }
     }
   }
 
-  // --- Field-Level Validation ---
+  // If card was not found, don't spam secondary field warnings on a non-existent card
+  if (!matchedCard) {
+    const hasError = issues.some((i) => i.severity === 'error');
+    const hasWarning = issues.some((i) => i.severity === 'warning');
+    const status: RowStatus = hasError ? 'error' : hasWarning ? 'warning' : 'valid';
+    return { rowNumber: row.rowNumber, status, idRaw: '', matchedCard: null, issues };
+  }
+
+  // --- Field-Level Validation (Only for matched cards) ---
   for (const [header, fieldKey] of Object.entries(config.mappings)) {
     if (fieldKey === 'ignore' || fieldKey === 'id') continue;
     const rawValue = row.values[header] ?? '';
+    const cleanField = cleanHeaderLabel(header);
 
     if (fieldKey === 'due') {
       if (rawValue.trim()) {
         const parsed = parseDate(rawValue);
         if (!parsed) {
           issues.push({
-            field: header,
-            message: `"${rawValue}" is not a recognisable date. Use YYYY-MM-DD (e.g. 2026-12-31).`,
+            field: cleanField,
+            message: `"${rawValue}" is an invalid date. Use YYYY-MM-DD.`,
             severity: 'error',
           });
         } else {
           const now = new Date();
           if (parsed < now) {
             issues.push({
-              field: header,
+              field: cleanField,
               message: `Due date "${rawValue}" is in the past.`,
               severity: 'warning',
             });
@@ -199,7 +224,7 @@ function validateRow(
         const listId = indexes.listByName.get(rawValue.toLowerCase().trim());
         if (!listId) {
           issues.push({
-            field: header,
+            field: cleanField,
             message: `List "${rawValue}" does not exist on this board.`,
             severity: 'error',
           });
@@ -213,8 +238,8 @@ function validateRow(
         for (const name of labelNames) {
           if (!indexes.labelByName.has(name.toLowerCase())) {
             issues.push({
-              field: header,
-              message: `Label "${name}" does not exist on this board — it will be skipped.`,
+              field: cleanField,
+              message: `Label "${name}" will be added as new or skipped.`,
               severity: 'warning',
             });
           }
@@ -232,8 +257,8 @@ function validateRow(
             !indexes.memberByFullName.has(lc)
           ) {
             issues.push({
-              field: header,
-              message: `Member "${name}" is not on this board — they will be skipped.`,
+              field: cleanField,
+              message: `Member "${name}" is not on this board.`,
               severity: 'warning',
             });
           }
@@ -292,7 +317,7 @@ export function validateRows(
     // Add duplicate ID error
     if (rawId && duplicateIdValues.has(rawId)) {
       result.issues.unshift({
-        field: idHeader ?? 'Card ID',
+        field: idHeader ? cleanHeaderLabel(idHeader) : 'Card ID',
         message: `Duplicate: "${rawId}" appears on multiple rows. Only the first match will be processed.`,
         severity: 'error',
       });

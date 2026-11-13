@@ -137,6 +137,28 @@ export function ValidationStep({
         </div>
       )}
 
+      {/* Zero Matches Helper Card */}
+      {summary.validCount === 0 && summary.errorCount > 0 && (
+        <div className="cs-help-box">
+          <div className="cs-help-box-title">
+            <span>💡</span> Why did cards fail to match?
+          </div>
+          <p style={{ margin: 0, lineHeight: 1.45 }}>
+            Trello cards are identified by their unique <strong>24-character Card ID</strong> (e.g. <code>6a58d5d106fa05b2844281ce</code>), card numbers (like <code>#1</code>, <code>#2</code>), or exact card names. Custom names like <code>CARD-1001</code> do not exist on this board.
+          </p>
+          <div style={{ marginTop: 4, display: 'flex', gap: 10, alignItems: 'center' }}>
+            <strong>Recommended fix:</strong>
+            <button
+              type="button"
+              className="cs-btn cs-btn-sm"
+              onClick={onBack}
+            >
+              &larr; Check Column Mapping
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Filter Tabs */}
       <div className="cs-row" style={{ alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
         <div className="cs-filter-tabs">
@@ -180,25 +202,26 @@ export function ValidationStep({
       </div>
 
       {/* Validation Results Table */}
-      <div className="cs-table-wrap" style={{ maxHeight: 380 }}>
-        <table className="cs-table">
+      <div className="cs-table-wrap" style={{ maxHeight: 420 }}>
+        <table className="cs-table cs-table-validation">
           <thead>
             <tr>
-              <th style={{ width: '8%' }}>Row</th>
-              <th style={{ width: '12%' }}>Status</th>
-              <th style={{ width: '22%' }}>CSV Identifier</th>
-              <th style={{ width: '28%' }}>Matched Trello Card</th>
-              <th style={{ width: '30%' }}>Validation Details</th>
+              <th style={{ width: '48px', textAlign: 'center' }}>Row</th>
+              <th style={{ width: '92px' }}>Status</th>
+              <th style={{ width: '130px' }}>CSV Identifier</th>
+              <th style={{ width: '200px' }}>Matched Trello Card</th>
+              <th>Validation Details &amp; Issues</th>
             </tr>
           </thead>
           <tbody>
             {filteredRows.map((row) => {
               const matched = row.matchedCard;
               const listName = matched?.idList ? listById.get(matched.idList) : undefined;
+              const isError = row.status === 'error';
 
               return (
-                <tr key={row.rowNumber}>
-                  <td className="cs-row-num">{row.rowNumber}</td>
+                <tr key={row.rowNumber} className={isError ? 'cs-row-error' : undefined}>
+                  <td className="cs-row-num" style={{ textAlign: 'center' }}>{row.rowNumber}</td>
 
                   <td>
                     {row.status === 'valid' && (
@@ -219,9 +242,9 @@ export function ValidationStep({
                   </td>
 
                   <td>
-                    <code style={{ fontSize: 11, wordBreak: 'break-all' }}>
+                    <span className="cs-sample-chip" style={{ maxWidth: '120px' }} title={row.idRaw}>
                       {row.idRaw || <span className="cs-cell-empty">(blank)</span>}
-                    </code>
+                    </span>
                   </td>
 
                   <td>
@@ -232,11 +255,11 @@ export function ValidationStep({
                         </div>
                         <div className="cs-matched-card-meta">
                           {listName ? `List: ${listName}` : ''}
-                          {matched.idShort ? ` • Card #${matched.idShort}` : ''}
+                          {matched.idShort ? ` • #${matched.idShort}` : ''}
                         </div>
                       </div>
                     ) : (
-                      <span style={{ color: 'var(--cs-danger)', fontSize: 12 }}>
+                      <span style={{ color: 'var(--cs-danger)', fontSize: 12, fontWeight: 500 }}>
                         No card found on board
                       </span>
                     )}
@@ -244,26 +267,28 @@ export function ValidationStep({
 
                   <td>
                     {row.issues.length === 0 ? (
-                      <span style={{ color: 'var(--cs-text-muted)', fontSize: 12 }}>
-                        All fields valid & ready
+                      <span style={{ color: 'var(--cs-success)', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        ✓ All fields valid &amp; ready to update
                       </span>
                     ) : (
                       <div className="cs-issue-list">
-                        {row.issues.map((issue, idx) => (
-                          <div
-                            key={idx}
-                            className={`cs-issue-badge ${
-                              issue.severity === 'error'
-                                ? 'cs-issue-badge-error'
-                                : 'cs-issue-badge-warning'
-                            }`}
-                          >
-                            <span>{issue.severity === 'error' ? '✖' : '⚠'}</span>
-                            <span>
-                              <strong>[{issue.field}]</strong> {issue.message}
-                            </span>
-                          </div>
-                        ))}
+                        {row.issues.map((issue, idx) => {
+                          const isErr = issue.severity === 'error';
+                          return (
+                            <div
+                              key={idx}
+                              className={`cs-issue-badge ${
+                                isErr ? 'cs-issue-badge-error' : 'cs-issue-badge-warning'
+                              }`}
+                            >
+                              <span className="cs-issue-icon">{isErr ? '✕' : '⚠'}</span>
+                              <div>
+                                <span className="cs-issue-tag">[{issue.field}]:</span>
+                                <span>{issue.message}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </td>
