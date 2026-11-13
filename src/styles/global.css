@@ -98,19 +98,25 @@ body {
 }
 
 .cs-btn:disabled {
-  opacity: 0.55;
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
 .cs-btn-primary {
   background: var(--cs-primary);
   border-color: var(--cs-primary);
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .cs-btn-primary:hover:not(:disabled) {
   background: var(--cs-primary-hover);
   border-color: var(--cs-primary-hover);
+}
+
+.cs-btn-primary:disabled {
+  background: var(--cs-primary) !important;
+  border-color: var(--cs-primary) !important;
+  color: #ffffff !important;
 }
 
 .cs-btn-subtle {

@@ -119,6 +119,41 @@ export function ModalApp() {
     };
   }, [t, loadBoardData]);
 
+  useEffect(() => {
+    if (!t) return;
+
+    async function handleStorage(event: StorageEvent) {
+      if (event.key === 'token' && event.newValue && t) {
+        const token = event.newValue.trim();
+        try {
+          localStorage.removeItem('token');
+        } catch {
+          // ignore
+        }
+        if (token.length > 10) {
+          try {
+            const result = await saveManualToken(t, token);
+            setAuth({
+              state: 'authorized',
+              member: result.member,
+              token: result.token,
+            });
+            if (board) {
+              void loadBoardData(board, result.token);
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [t, board, loadBoardData]);
+
   async function handleAuthorize() {
     if (!t || authorizing) return;
     setAuthorizing(true);

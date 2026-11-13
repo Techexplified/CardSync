@@ -93,29 +93,58 @@ export async function authorizeTrello(
   }
 
   const authUrl = buildTrelloAuthUrl();
-  let token: string | null;
 
-  try {
-    token = await t.authorize(authUrl, {
+  const token = await new Promise<string>((resolve, reject) => {
+    let popupWinRef: Window | null = null;
+    let isSettled = false;
+    let closedCheckTimer: ReturnType<typeof setInterval> | null = null;
+
+    const cleanup = () => {
+      isSettled = true;
+      if (closedCheckTimer) {
+        clearInterval(closedCheckTimer);
+        closedCheckTimer = null;
+      }
+    };
+
+    setTimeout(() => {
+      if (isSettled) return;
+      if (!popupWinRef) {
+        cleanup();
+        reject(
+          new Error(
+            'Your browser blocked the authorization popup window. Please use the "Authorize in New Tab" option below.'
+          )
+        );
+      } else {
+        closedCheckTimer = setInterval(() => {
+          if (popupWinRef?.closed) {
+            cleanup();
+            reject(
+              new Error('Authorization popup was closed before completing.')
+            );
+          }
+        }, 1000);
+      }
+    }, 400);
+
+    t.authorize(authUrl, {
       height: 720,
       width: 600,
       validToken: (tok) => typeof tok === 'string' && tok.trim().length > 10,
-    });
-  } catch (authErr) {
-    try {
-      const restApi = t.getRestApi();
-      await (restApi as unknown as {
-        authorize: (opts: Record<string, unknown>) => Promise<void>;
-      }).authorize({
-        scope: 'read,write',
-        expiration: '30days',
-        returnUrl: `${window.location.origin}/auth.html`,
+      windowCallback: (win) => {
+        popupWinRef = win;
+      },
+    })
+      .then((tok) => {
+        cleanup();
+        resolve(tok);
+      })
+      .catch((err) => {
+        cleanup();
+        reject(err instanceof Error ? err : new Error(String(err)));
       });
-      token = await restApi.getToken();
-    } catch {
-      throw authErr;
-    }
-  }
+  });
 
   if (!token) {
     throw new Error(
