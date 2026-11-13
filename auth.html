@@ -100,9 +100,25 @@
             localStorage.setItem('token', token);
           } catch (e) {}
 
+          // Channel 1: BroadcastChannel across tabs on same origin
           try {
-            if (window.opener && typeof window.opener.authorize === 'function') {
-              window.opener.authorize(token);
+            var bc = new BroadcastChannel('cardsync_auth_channel');
+            bc.postMessage({ type: 'CARDSYNC_AUTH_TOKEN', token: token });
+            setTimeout(function () {
+              try { bc.close(); } catch (err) {}
+            }, 1000);
+          } catch (e) {}
+
+          // Channel 2: postMessage to opener
+          try {
+            if (window.opener) {
+              window.opener.postMessage(
+                { type: 'CARDSYNC_AUTH_TOKEN', token: token },
+                '*'
+              );
+              if (typeof window.opener.authorize === 'function') {
+                window.opener.authorize(token);
+              }
             }
           } catch (e) {}
 
@@ -128,7 +144,7 @@
             try {
               window.close();
             } catch (e) {}
-          }, 1200);
+          }, 1500);
         } else {
           document.getElementById('status-pill').textContent = 'Waiting for Token';
           document.getElementById('status-pill').style.background = '#fff7d6';

@@ -157,13 +157,22 @@ export async function authorizeTrello(
   return { member, token };
 }
 
+export function extractTokenFromInput(rawInput: string): string {
+  const trimmed = rawInput.trim();
+  const tokenMatch = trimmed.match(/token=([a-zA-Z0-9]+)/i);
+  if (tokenMatch && tokenMatch[1]) {
+    return tokenMatch[1];
+  }
+  return trimmed;
+}
+
 export async function saveManualToken(
   t: TrelloClient,
   rawToken: string
 ): Promise<{ member: TrelloMemberProfile; token: string }> {
-  const token = rawToken.trim();
+  const token = extractTokenFromInput(rawToken);
   if (!token) {
-    throw new Error('Please enter a valid Trello token.');
+    throw new Error('Please enter a valid Trello token or authorization URL.');
   }
 
   const member = await fetchAuthorizedMember(token);

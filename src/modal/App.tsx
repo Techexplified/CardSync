@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  authorizeTrello,
   buildTrelloAuthUrl,
   disconnectTrello,
   getAuthStatus,
@@ -118,11 +117,39 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
     };
   }, [t, loadBoardData]);
 
+  const applyToken = useCallback(
+    async (tokenString: string) => {
+      if (!t) return;
+      try {
+        const result = await saveManualToken(t, tokenString);
+        setAuth({
+          state: 'authorized',
+          member: result.member,
+          token: result.token,
+        });
+        setAuthorizing(false);
+        setError(null);
+        if (board) {
+          void loadBoardData(board, result.token);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to authorize with the received token.'
+        );
+        setAuthorizing(false);
+      }
+    },
+    [t, board, loadBoardData]
+  );
+
+  // Auto-listen for token from redirect tab via postMessage, BroadcastChannel, and localStorage
   useEffect(() => {
     if (!t) return;
 
-    async function handleStorage(event: StorageEvent) {
-      if (event.key === 'token' && event.newValue && t) {
+    function handleStorage(event: StorageEvent) {
+      if (event.key === 'token' && event.newValue) {
         const token = event.newValue.trim();
         try {
           localStorage.removeItem('token');
@@ -130,53 +157,89 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
           // ignore
         }
         if (token.length > 10) {
-          try {
-            const result = await saveManualToken(t, token);
-            setAuth({
-              state: 'authorized',
-              member: result.member,
-              token: result.token,
-            });
-            if (board) {
-              void loadBoardData(board, result.token);
-            }
-          } catch {
-            // ignore
-          }
+          void applyToken(token);
         }
       }
     }
 
+    function handleMessage(event: MessageEvent) {
+      if (
+        event.data &&
+        typeof event.data === 'object' &&
+        event.data.type === 'CARDSYNC_AUTH_TOKEN' &&
+        typeof event.data.token === 'string'
+      ) {
+        void applyToken(event.data.token);
+      }
+    }
+
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel('cardsync_auth_channel');
+      bc.onmessage = (event: MessageEvent<{ token?: string }>) => {
+        if (event.data?.token) {
+          void applyToken(event.data.token);
+        }
+      };
+    } catch {
+      // ignore
+    }
+
     window.addEventListener('storage', handleStorage);
+    window.addEventListener('message', handleMessage);
     return () => {
       window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('message', handleMessage);
+      if (bc) {
+        bc.close();
+      }
     };
-  }, [t, board, loadBoardData]);
+  }, [t, applyToken]);
 
-  async function handleAuthorize() {
-    if (!t || authorizing) return;
+  function handleAuthorize() {
+    if (!t) return;
     setAuthorizing(true);
     setError(null);
-    try {
-      const result = await authorizeTrello(t);
-      setAuth({
-        state: 'authorized',
-        member: result.member,
-        token: result.token,
-      });
-      if (board) {
-        void loadBoardData(board, result.token);
-      }
-    } catch (err) {
+    const authUrl = buildTrelloAuthUrl();
+    const authWin = window.open(authUrl, 'cardsync_auth_window');
+
+    if (!authWin) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Trello authorization popup was blocked or closed. You can use the manual option below.'
+        'Popup window was blocked by your browser. Please use the fallback link below.'
       );
       setShowManual(true);
-    } finally {
       setAuthorizing(false);
+      return;
     }
+
+    // Actively poll the auth window's URL.
+    // While the user is on trello.com, cross-origin access throws an error (caught safely).
+    // The moment Trello redirects to auth.html on our origin, we can read the token directly from the URL!
+    const pollInterval = setInterval(() => {
+      try {
+        if (authWin.closed) {
+          clearInterval(pollInterval);
+          setAuthorizing(false);
+          return;
+        }
+
+        const currentUrl = authWin.location.href;
+        if (currentUrl && currentUrl.includes('#token=')) {
+          const match = currentUrl.match(/token=([^&]+)/);
+          if (match && match[1]) {
+            clearInterval(pollInterval);
+            try {
+              authWin.close();
+            } catch {
+              // ignore
+            }
+            void applyToken(decodeURIComponent(match[1]));
+          }
+        }
+      } catch {
+        // Cross-origin restriction while on trello.com — expected until redirect occurs
+      }
+    }, 400);
   }
 
   async function handleSaveManualToken() {
@@ -375,45 +438,36 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
               <button
                 type="button"
                 className="cs-btn cs-btn-primary"
-                disabled={authorizing}
-                onClick={() => void handleAuthorize()}
+                onClick={() => handleAuthorize()}
               >
-                {authorizing
-                  ? 'Opening Trello Authorization...'
-                  : 'Connect Trello Account'}
+                Connect Trello Account ↗
               </button>
               <button
                 type="button"
                 className="cs-btn cs-btn-subtle"
                 onClick={() => setShowManual((prev) => !prev)}
               >
-                {showManual ? 'Hide Manual Option' : 'Popup Blocked? Connect Manually'}
+                {showManual ? 'Hide Manual Token' : 'Paste Token / URL Manually'}
               </button>
             </div>
 
+            {authorizing && (
+              <div className="cs-alert" style={{ background: '#e9f2ff', color: '#0052cc', border: '1px solid #b3d4ff' }}>
+                Opened Trello authorization in a new tab. Click <strong>Allow</strong> on Trello! CardSync will connect automatically once approved.
+              </div>
+            )}
+
             {showManual && (
               <div className="cs-subbox cs-stack-sm" style={{ marginTop: 8 }}>
-                <div className="cs-label">Manual Authorization Fallback</div>
+                <div className="cs-label">Paste Token or Callback URL</div>
                 <p className="cs-card-desc" style={{ marginBottom: 6 }}>
-                  If your browser blocks popup windows inside Trello, open the
-                  authorization link in a new tab, approve access, and paste the
-                  returned token below.
+                  If the tab does not close automatically, copy the token or the full URL from the address bar (e.g. <code>https://...#token=...</code>) and paste it below:
                 </p>
-                <div>
-                  <a
-                    href={buildTrelloAuthUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cs-btn cs-btn-sm"
-                  >
-                    Open Trello Authorization in New Tab ↗
-                  </a>
-                </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                   <input
                     type="text"
                     className="cs-input"
-                    placeholder="Paste token here (e.g. 64-character token)"
+                    placeholder="Paste token or redirected URL (e.g. https://...#token=...)"
                     value={manualToken}
                     onChange={(e) => setManualToken(e.target.value)}
                   />
