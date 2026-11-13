@@ -96,31 +96,40 @@
         }
 
         if (token) {
-          try {
-            localStorage.setItem('token', token);
-          } catch (e) {}
-
-          // Channel 1: BroadcastChannel across tabs on same origin
-          try {
-            var bc = new BroadcastChannel('cardsync_auth_channel');
-            bc.postMessage({ type: 'CARDSYNC_AUTH_TOKEN', token: token });
-            setTimeout(function () {
-              try { bc.close(); } catch (err) {}
-            }, 1000);
-          } catch (e) {}
-
-          // Channel 2: postMessage to opener
-          try {
-            if (window.opener) {
-              window.opener.postMessage(
-                { type: 'CARDSYNC_AUTH_TOKEN', token: token },
-                '*'
-              );
-              if (typeof window.opener.authorize === 'function') {
-                window.opener.authorize(token);
+          // Broadcast via all available channels
+          function broadcastToken() {
+            // Channel 1: postMessage to window.opener
+            try {
+              if (window.opener) {
+                window.opener.postMessage(
+                  { type: 'CARDSYNC_AUTH_TOKEN', token: token },
+                  '*'
+                );
+                if (typeof window.opener.authorize === 'function') {
+                  window.opener.authorize(token);
+                }
               }
-            }
-          } catch (e) {}
+            } catch (e) {}
+
+            // Channel 2: BroadcastChannel
+            try {
+              var bc = new BroadcastChannel('cardsync_auth_channel');
+              bc.postMessage({ type: 'CARDSYNC_AUTH_TOKEN', token: token });
+              setTimeout(function () {
+                try { bc.close(); } catch (err) {}
+              }, 1000);
+            } catch (e) {}
+
+            // Channel 3: localStorage
+            try {
+              localStorage.setItem('token', token);
+            } catch (e) {}
+          }
+
+          // Broadcast immediately and with short retries to prevent race conditions
+          broadcastToken();
+          setTimeout(broadcastToken, 250);
+          setTimeout(broadcastToken, 600);
 
           var tokenDisplay = document.getElementById('token-display');
           var tokenVal = document.getElementById('token-val');

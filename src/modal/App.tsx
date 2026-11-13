@@ -144,9 +144,16 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
     [t, board, loadBoardData]
   );
 
-  // Auto-listen for token from redirect tab via postMessage, BroadcastChannel, and localStorage
+  // Auto-listen for token from redirect tab via postMessage, window.authorize, BroadcastChannel, and localStorage
   useEffect(() => {
     if (!t) return;
+
+    // Attach Trello's classic callback on window so window.opener.authorize() works
+    (window as unknown as { authorize?: (tok: string) => void }).authorize = (
+      tok: string
+    ) => {
+      void applyToken(tok);
+    };
 
     function handleStorage(event: StorageEvent) {
       if (event.key === 'token' && event.newValue) {
@@ -193,54 +200,9 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
       if (bc) {
         bc.close();
       }
+      delete (window as unknown as { authorize?: (tok: string) => void }).authorize;
     };
   }, [t, applyToken]);
-
-  function handleAuthorize() {
-    if (!t) return;
-    setAuthorizing(true);
-    setError(null);
-    const authUrl = buildTrelloAuthUrl();
-    const authWin = window.open(authUrl, 'cardsync_auth_window');
-
-    if (!authWin) {
-      setError(
-        'Popup window was blocked by your browser. Please use the fallback link below.'
-      );
-      setShowManual(true);
-      setAuthorizing(false);
-      return;
-    }
-
-    // Actively poll the auth window's URL.
-    // While the user is on trello.com, cross-origin access throws an error (caught safely).
-    // The moment Trello redirects to auth.html on our origin, we can read the token directly from the URL!
-    const pollInterval = setInterval(() => {
-      try {
-        if (authWin.closed) {
-          clearInterval(pollInterval);
-          setAuthorizing(false);
-          return;
-        }
-
-        const currentUrl = authWin.location.href;
-        if (currentUrl && currentUrl.includes('#token=')) {
-          const match = currentUrl.match(/token=([^&]+)/);
-          if (match && match[1]) {
-            clearInterval(pollInterval);
-            try {
-              authWin.close();
-            } catch {
-              // ignore
-            }
-            void applyToken(decodeURIComponent(match[1]));
-          }
-        }
-      } catch {
-        // Cross-origin restriction while on trello.com — expected until redirect occurs
-      }
-    }, 400);
-  }
 
   async function handleSaveManualToken() {
     if (!t || savingManual || !manualToken.trim()) return;
@@ -435,13 +397,18 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
               </div>
             </div>
             <div className="cs-actions">
-              <button
-                type="button"
+              <a
+                href={buildTrelloAuthUrl()}
+                target="_blank"
+                rel="opener"
                 className="cs-btn cs-btn-primary"
-                onClick={() => handleAuthorize()}
+                onClick={() => {
+                  setAuthorizing(true);
+                  setError(null);
+                }}
               >
                 Connect Trello Account ↗
-              </button>
+              </a>
               <button
                 type="button"
                 className="cs-btn cs-btn-subtle"
