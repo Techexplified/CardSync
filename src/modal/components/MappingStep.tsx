@@ -294,7 +294,7 @@ export function MappingStep({
                     </div>
                     <div>
                       <div className="cs-sync-choice-label">
-                        Merge <span className="cs-sync-badge-rec">Recommended</span>
+                        Merge 
                       </div>
                       <div className="cs-sync-choice-detail">
                         Keep existing labels and add new ones from CSV.
