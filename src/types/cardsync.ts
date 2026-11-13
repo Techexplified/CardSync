@@ -13,3 +13,39 @@ export interface ParsedCsvData {
   parseWarnings: string[];
 }
 
+export type TrelloFieldKey =
+  | 'id'
+  | 'name'
+  | 'desc'
+  | 'due'
+  | 'idList'
+  | 'labels'
+  | 'members'
+  | 'ignore';
+
+export type MultiValueMode = 'replace' | 'append';
+
+export interface ColumnMappingConfig {
+  mappings: Record<string, TrelloFieldKey>;
+  labelsMode: MultiValueMode;
+  membersMode: MultiValueMode;
+}
+
+export interface TrelloFieldDefinition {
+  key: TrelloFieldKey;
+  label: string;
+  shortLabel: string;
+  description: string;
+  isIdentifier?: boolean;
+  isUpdatable?: boolean;
+}
+
+export interface MappingValidationResult {
+  isValid: boolean;
+  idHeader: string | null;
+  updatableFields: TrelloFieldKey[];
+  ignoredHeaders: string[];
+  duplicateErrors: { field: TrelloFieldKey; fieldLabel: string; headers: string[] }[];
+  errors: string[];
+}
+

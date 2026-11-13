@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
+  createInitialMapping,
+  loadBoardMapping,
+  saveBoardMapping,
+} from '../core/mapping';
+import {
   buildTrelloAuthUrl,
   disconnectTrello,
   getAuthStatus,
@@ -7,8 +12,9 @@ import {
   type AuthStatus,
 } from '../services/trelloAuth';
 import { fetchBoardSnapshot } from '../services/trelloBoard';
-import type { ParsedCsvData } from '../types/cardsync';
+import type { ColumnMappingConfig, ParsedCsvData } from '../types/cardsync';
 import type { BoardSnapshot, TrelloBoard, TrelloClient } from '../types/trello';
+import { MappingStep } from './components/MappingStep';
 import { UploadStep } from './components/UploadStep';
 
 const WIZARD_STEPS = [
@@ -57,6 +63,8 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const [csvData, setCsvData] = useState<ParsedCsvData | null>(null);
+  const [mappingConfig, setMappingConfig] = useState<ColumnMappingConfig | null>(null);
+  const [savedMapping, setSavedMapping] = useState<ColumnMappingConfig | null>(null);
 
   const [manualToken, setManualToken] = useState('');
   const [showManual, setShowManual] = useState(false);
@@ -87,13 +95,15 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
     async function load() {
       if (!t) return;
       try {
-        const [boardData, authStatus] = await Promise.all([
+        const [boardData, authStatus, previousMapping] = await Promise.all([
           t.board('id', 'name'),
           getAuthStatus(t),
+          loadBoardMapping(t),
         ]);
         if (cancelled) return;
         setBoard(boardData);
         setAuth(authStatus);
+        setSavedMapping(previousMapping);
 
         if (authStatus.state === 'authorized') {
           void loadBoardData(boardData, authStatus.token);
@@ -459,32 +469,57 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
             snapshotError={snapshotError}
             csvData={csvData}
             onRefreshBoard={handleRefreshBoard}
-            onCsvLoaded={(data) => setCsvData(data)}
+            onCsvLoaded={(data) => {
+              setCsvData(data);
+              setMappingConfig(createInitialMapping(data.headers, savedMapping));
+            }}
             onContinue={() => setActiveStep(1)}
           />
         )}
 
-        {!loading && auth?.state === 'authorized' && activeStep === 1 && csvData && (
-          <section className="cs-card cs-stack-md">
-            <div className="cs-row">
-              <div>
-                <h2 className="cs-card-title">Step 2: Column Mapping</h2>
-                <p className="cs-card-desc">
-                  CSV loaded: <strong>{csvData.fileName}</strong> (
-                  {csvData.rows.length} rows, {csvData.headers.length} columns). Ready
-                  for <strong>Feature C (Column Mapping)</strong>.
-                </p>
+        {!loading &&
+          auth?.state === 'authorized' &&
+          activeStep === 1 &&
+          csvData &&
+          mappingConfig && (
+            <MappingStep
+              csvData={csvData}
+              mappingConfig={mappingConfig}
+              onMappingChange={(newConfig) => setMappingConfig(newConfig)}
+              onBack={() => setActiveStep(0)}
+              onContinue={() => {
+                if (t && mappingConfig) {
+                  void saveBoardMapping(t, mappingConfig);
+                  setSavedMapping(mappingConfig);
+                }
+                setActiveStep(2);
+              }}
+            />
+          )}
+
+        {!loading &&
+          auth?.state === 'authorized' &&
+          activeStep === 2 &&
+          csvData &&
+          mappingConfig && (
+            <section className="cs-card cs-stack-md">
+              <div className="cs-row">
+                <div>
+                  <h2 className="cs-card-title">Step 3: Validation & Matching</h2>
+                  <p className="cs-card-desc">
+                    Ready to validate {csvData.rows.length} rows against {snapshot?.cards.length ?? 0} board cards.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="cs-btn"
+                  onClick={() => setActiveStep(1)}
+                >
+                  &larr; Back to Column Mapping
+                </button>
               </div>
-              <button
-                type="button"
-                className="cs-btn"
-                onClick={() => setActiveStep(0)}
-              >
-                &larr; Back to CSV Upload
-              </button>
-            </div>
-          </section>
-        )}
+            </section>
+          )}
       </div>
     </main>
   );
