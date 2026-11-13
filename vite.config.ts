@@ -17,6 +17,7 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         modal: resolve(import.meta.dirname, 'modal.html'),
+        auth: resolve(import.meta.dirname, 'auth.html'),
         popup: resolve(import.meta.dirname, 'popup.html'),
         settings: resolve(import.meta.dirname, 'settings.html'),
       },

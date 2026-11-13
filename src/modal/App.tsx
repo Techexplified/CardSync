@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { getTrelloInitOptions } from '../config/trello';
 import {
   authorizeTrello,
+  buildTrelloAuthUrl,
   disconnectTrello,
   getAuthStatus,
+  saveManualToken,
   type AuthStatus,
 } from '../services/trelloAuth';
 import { fetchBoardSnapshot } from '../services/trelloBoard';
@@ -57,6 +59,10 @@ export function ModalApp() {
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const [csvData, setCsvData] = useState<ParsedCsvData | null>(null);
+
+  const [manualToken, setManualToken] = useState('');
+  const [showManual, setShowManual] = useState(false);
+  const [savingManual, setSavingManual] = useState(false);
 
   const loadBoardData = useCallback(
     async (boardData: TrelloBoard, token: string) => {
@@ -131,10 +137,38 @@ export function ModalApp() {
       setError(
         err instanceof Error
           ? err.message
-          : 'Trello authorization was canceled or blocked. Verify Allowed Origins in Trello Admin.'
+          : 'Trello authorization popup was blocked or closed. You can use the manual option below.'
       );
+      setShowManual(true);
     } finally {
       setAuthorizing(false);
+    }
+  }
+
+  async function handleSaveManualToken() {
+    if (!t || savingManual || !manualToken.trim()) return;
+    setSavingManual(true);
+    setError(null);
+    try {
+      const result = await saveManualToken(t, manualToken);
+      setAuth({
+        state: 'authorized',
+        member: result.member,
+        token: result.token,
+      });
+      setManualToken('');
+      setShowManual(false);
+      if (board) {
+        void loadBoardData(board, result.token);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Invalid Trello token. Please verify and try again.'
+      );
+    } finally {
+      setSavingManual(false);
     }
   }
 
@@ -303,7 +337,7 @@ export function ModalApp() {
                 <code>30 days</code>
               </div>
             </div>
-            <div>
+            <div className="cs-actions">
               <button
                 type="button"
                 className="cs-btn cs-btn-primary"
@@ -314,7 +348,52 @@ export function ModalApp() {
                   ? 'Opening Trello Authorization...'
                   : 'Connect Trello Account'}
               </button>
+              <button
+                type="button"
+                className="cs-btn cs-btn-subtle"
+                onClick={() => setShowManual((prev) => !prev)}
+              >
+                {showManual ? 'Hide Manual Option' : 'Popup Blocked? Connect Manually'}
+              </button>
             </div>
+
+            {showManual && (
+              <div className="cs-subbox cs-stack-sm" style={{ marginTop: 8 }}>
+                <div className="cs-label">Manual Authorization Fallback</div>
+                <p className="cs-card-desc" style={{ marginBottom: 6 }}>
+                  If your browser blocks popup windows inside Trello, open the
+                  authorization link in a new tab, approve access, and paste the
+                  returned token below.
+                </p>
+                <div>
+                  <a
+                    href={buildTrelloAuthUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="cs-btn cs-btn-sm"
+                  >
+                    Open Trello Authorization in New Tab ↗
+                  </a>
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  <input
+                    type="text"
+                    className="cs-input"
+                    placeholder="Paste token here (e.g. 64-character token)"
+                    value={manualToken}
+                    onChange={(e) => setManualToken(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="cs-btn cs-btn-primary cs-btn-sm"
+                    disabled={savingManual || !manualToken.trim()}
+                    onClick={() => void handleSaveManualToken()}
+                  >
+                    {savingManual ? 'Saving...' : 'Save Token'}
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         )}
 

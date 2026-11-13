@@ -150,6 +150,15 @@ export interface TrelloClient {
   sizeTo: (selector: string | HTMLElement) => Promise<void>;
   arg: <T = unknown>(name: string, defaultValue?: T) => T;
   signUrl: (url: string) => string;
+  authorize: (
+    url: string | ((secret: string) => string),
+    options?: {
+      height?: number;
+      width?: number;
+      validToken?: (token: string) => boolean;
+      windowCallback?: (win: Window | null) => void;
+    }
+  ) => Promise<string>;
   getRestApi: () => TrelloRestApi;
 }
 
