@@ -475,23 +475,26 @@ body {
   padding: 10px 14px;
 }
 
-/* Data Table */
-.cs-table-wrap {
+/* Data Table - insulated from Trello power-up.min.css overrides */
+.cs-scope .cs-table-wrap {
   overflow: auto;
-  max-height: 320px;
+  max-height: 340px;
   border: 1px solid var(--cs-border);
   border-radius: 8px;
-  background: var(--cs-surface);
+  background: #ffffff !important;
 }
 
-.cs-table {
+.cs-scope table.cs-table,
+.cs-scope .cs-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12.5px;
+  background-color: #ffffff !important;
+  color: var(--cs-text) !important;
 }
 
-.cs-table th,
-.cs-table td {
+.cs-scope .cs-table th,
+.cs-scope .cs-table td {
   text-align: left;
   padding: 9px 12px;
   border-bottom: 1px solid #ebecf0;
@@ -499,41 +502,57 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--cs-text) !important;
+  background-color: transparent;
 }
 
-.cs-table th {
+.cs-scope .cs-table th {
   position: sticky;
   top: 0;
-  z-index: 1;
-  background: #f7f8f9;
+  z-index: 2;
+  background-color: #f7f8f9 !important;
   font-weight: 700;
   font-size: 11.5px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--cs-text-secondary);
+  color: var(--cs-text-secondary) !important;
   border-bottom: 1px solid var(--cs-border);
 }
 
-.cs-table tbody tr:nth-child(even) {
-  background: #fafbfc;
+/* Explicit alternating row colors overriding external Trello table rules */
+.cs-scope .cs-table tbody tr,
+.cs-scope .cs-table tbody tr:nth-child(odd) {
+  background-color: #ffffff !important;
+  color: var(--cs-text) !important;
 }
 
-.cs-table tbody tr:hover {
-  background: #f1f6ff;
+.cs-scope .cs-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa !important;
+  color: var(--cs-text) !important;
 }
 
-.cs-table tbody tr:last-child td {
+.cs-scope .cs-table tbody tr:hover,
+.cs-scope .cs-table tbody tr:hover td {
+  background-color: #e9f2ff !important;
+}
+
+.cs-scope .cs-table tbody tr td {
+  color: var(--cs-text) !important;
+}
+
+.cs-scope .cs-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.cs-row-num {
-  color: var(--cs-text-muted);
+.cs-scope .cs-row-num {
+  color: var(--cs-text-muted) !important;
   font-variant-numeric: tabular-nums;
   width: 56px;
+  font-weight: 600;
 }
 
-.cs-cell-empty {
-  color: #9fadbc;
+.cs-scope .cs-cell-empty {
+  color: #8c9bab !important;
 }
 
 /* Auth / Empty Hero Box */
