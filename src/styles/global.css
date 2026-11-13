@@ -802,6 +802,101 @@ body {
   letter-spacing: 0.04em;
 }
 
+/* Validation Filter Tabs */
+.cs-filter-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cs-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--cs-border);
+  background: #ffffff;
+  color: var(--cs-text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-filter-btn:hover {
+  background: var(--cs-surface-subtle);
+  border-color: var(--cs-border-strong);
+}
+
+.cs-filter-btn-active {
+  background: #f0f7ff !important;
+  border-color: var(--cs-primary) !important;
+  color: var(--cs-primary) !important;
+}
+
+.cs-filter-count {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.cs-filter-btn-active .cs-filter-count {
+  background: var(--cs-primary);
+  color: #ffffff;
+}
+
+/* Matched Card Display */
+.cs-matched-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-matched-card-name {
+  font-weight: 600;
+  color: var(--cs-text);
+  font-size: 12.5px;
+}
+
+.cs-matched-card-meta {
+  font-size: 11px;
+  color: var(--cs-text-muted);
+}
+
+/* Issue List */
+.cs-issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cs-issue-badge {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 11.5px;
+  line-height: 1.35;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
+.cs-issue-badge-error {
+  background: var(--cs-danger-soft);
+  color: var(--cs-danger);
+  border: 1px solid var(--cs-danger-border);
+}
+
+.cs-issue-badge-warning {
+  background: var(--cs-warning-soft);
+  color: var(--cs-warning);
+  border: 1px solid var(--cs-warning-border);
+}
+
 /* Standalone Status Page */
 .cs-status-page {
   min-height: 100vh;

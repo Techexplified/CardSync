@@ -14,8 +14,10 @@ import {
 import { fetchBoardSnapshot } from '../services/trelloBoard';
 import type { ColumnMappingConfig, ParsedCsvData } from '../types/cardsync';
 import type { BoardSnapshot, TrelloBoard, TrelloClient } from '../types/trello';
+import type { ValidatedRow } from '../core/validator';
 import { MappingStep } from './components/MappingStep';
 import { UploadStep } from './components/UploadStep';
+import { ValidationStep } from './components/ValidationStep';
 
 const WIZARD_STEPS = [
   'CSV Upload',
@@ -65,6 +67,7 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
   const [csvData, setCsvData] = useState<ParsedCsvData | null>(null);
   const [mappingConfig, setMappingConfig] = useState<ColumnMappingConfig | null>(null);
   const [savedMapping, setSavedMapping] = useState<ColumnMappingConfig | null>(null);
+  const [validatedRows, setValidatedRows] = useState<ValidatedRow[] | null>(null);
 
   const [manualToken, setManualToken] = useState('');
   const [showManual, setShowManual] = useState(false);
@@ -501,21 +504,41 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
           auth?.state === 'authorized' &&
           activeStep === 2 &&
           csvData &&
-          mappingConfig && (
+          mappingConfig &&
+          snapshot && (
+            <ValidationStep
+              csvData={csvData}
+              mappingConfig={mappingConfig}
+              snapshot={snapshot}
+              onBack={() => setActiveStep(1)}
+              onContinue={(rows) => {
+                setValidatedRows(rows);
+                setActiveStep(3);
+              }}
+            />
+          )}
+
+        {!loading &&
+          auth?.state === 'authorized' &&
+          activeStep === 3 &&
+          csvData &&
+          mappingConfig &&
+          snapshot &&
+          validatedRows && (
             <section className="cs-card cs-stack-md">
               <div className="cs-row">
                 <div>
-                  <h2 className="cs-card-title">Step 3: Validation & Matching</h2>
+                  <h2 className="cs-card-title">Step 4: Before &amp; After Preview</h2>
                   <p className="cs-card-desc">
-                    Ready to validate {csvData.rows.length} rows against {snapshot?.cards.length ?? 0} board cards.
+                    Ready to preview changes for <strong>{validatedRows.length} cards</strong> before applying updates to Trello.
                   </p>
                 </div>
                 <button
                   type="button"
                   className="cs-btn"
-                  onClick={() => setActiveStep(1)}
+                  onClick={() => setActiveStep(2)}
                 >
-                  &larr; Back to Column Mapping
+                  &larr; Back to Validation
                 </button>
               </div>
             </section>
