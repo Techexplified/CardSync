@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Step 4: Enhanced Diff Preview Styles
+   Step 4: Diff Preview Styles
    ========================================================================== */
 
 .cs-scope .cs-preview-header {
@@ -30,15 +30,31 @@
 }
 
 .cs-scope .cs-preview-search-box {
-  flex: 1 1 200px;
-  max-width: 260px;
+  flex: 1 1 220px;
+  max-width: 280px;
 }
 
+/* Explicit light-mode styling to fix black background bug */
 .cs-scope .cs-preview-search {
-  min-height: 30px;
-  font-size: 12.5px;
-  padding: 4px 8px;
+  min-height: 32px;
+  font-size: 13px;
+  padding: 6px 10px;
   border-radius: 6px;
+  background-color: #ffffff !important;
+  color: #172b4d !important;
+  border: 1px solid var(--cs-border) !important;
+  box-shadow: none;
+}
+
+.cs-scope .cs-preview-search::placeholder {
+  color: #626f86 !important;
+  opacity: 1;
+}
+
+.cs-scope .cs-preview-search:focus {
+  border-color: var(--cs-primary) !important;
+  box-shadow: 0 0 0 1px var(--cs-primary) !important;
+  outline: none;
 }
 
 .cs-scope .cs-preview-quick-actions {
@@ -55,15 +71,15 @@
   margin: 0 4px;
 }
 
-/* Card List Container */
+/* Diff Cards Scroll Container */
 .cs-scope .cs-diff-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 520px;
+  gap: 10px;
+  max-height: 480px;
   overflow-y: auto;
-  padding-right: 4px;
-  margin-top: 2px;
+  overflow-x: hidden;
+  padding: 2px 6px 8px 2px;
 }
 
 .cs-scope .cs-diff-empty-state {
@@ -72,9 +88,11 @@
   color: var(--cs-text-secondary);
 }
 
-/* Diff Card */
+/* Individual Card (CRITICAL: flex-shrink 0 prevents card squashing) */
 .cs-scope .cs-diff-card {
-  border: 1.5px solid var(--cs-border);
+  flex-shrink: 0;
+  min-height: min-content;
+  border: 1px solid var(--cs-border);
   border-radius: 8px;
   background: var(--cs-surface);
   overflow: hidden;
@@ -91,27 +109,27 @@
 }
 
 .cs-scope .cs-diff-card-nochange {
-  border-color: #e5e8ec;
-  background: #fbfcfd;
+  border-color: #e2e5e8;
+  background: #ffffff;
 }
 
 /* Card Header */
 .cs-scope .cs-diff-card-header {
   padding: 10px 14px;
-  background: #f8f9fa;
+  background: #f7f8f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 48px;
+  min-height: 46px;
 }
 
 .cs-scope .cs-diff-card-header-haschanges {
-  background: #f2f7fe;
-  border-bottom: 1px solid #dce8fa;
+  background: #f0f7ff;
+  border-bottom: 1px solid #d0e2ff;
 }
 
-/* Accessible Checkbox with Native Support */
+/* Checkbox */
 .cs-scope .cs-checkbox-wrapper {
   position: relative;
   display: inline-flex;
@@ -132,7 +150,7 @@
   width: 18px;
   height: 18px;
   border-radius: 4px;
-  border: 2px solid #99c0ff;
+  border: 2px solid #85b8ff;
   background: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -151,7 +169,7 @@
   outline-offset: 2px;
 }
 
-/* Card Titles */
+/* Title & Meta Info */
 .cs-scope .cs-diff-card-title-group {
   display: flex;
   align-items: center;
@@ -169,16 +187,19 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 480px;
 }
 
 .cs-scope .cs-diff-pill-id {
   font-size: 11px;
   padding: 2px 6px;
+  flex-shrink: 0;
 }
 
 .cs-scope .cs-diff-row-tag {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--cs-text-muted);
+  flex-shrink: 0;
 }
 
 .cs-scope .cs-diff-header-meta {
@@ -221,7 +242,7 @@
   grid-template-columns: 160px 1fr 28px 1fr;
   align-items: center;
   gap: 12px;
-  padding: 8px 10px;
+  padding: 7px 10px;
   border-radius: 6px;
   font-size: 12.5px;
 }
@@ -263,19 +284,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--cs-text-muted);
+}
+
+.cs-scope .cs-diff-arrow-changed {
   color: var(--cs-success);
 }
 
+/* Green badge ONLY for actual changes */
 .cs-scope .cs-diff-val-after {
   color: #124b30;
   background: #def7ec;
   border: 1px solid #b7ecd4;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+/* Neutral look for unchanged fields */
+.cs-scope .cs-diff-val-unchanged {
+  color: var(--cs-text-secondary);
+  background: #ffffff;
+  border: 1px solid var(--cs-border);
 }
 
 .cs-scope .cs-diff-val-same {
+  color: var(--cs-text-secondary);
+}
+
+.cs-scope .cs-diff-tag-unchanged {
   color: var(--cs-text-muted);
+  font-size: 11px;
   font-style: italic;
+  margin-left: 4px;
 }
 
 .cs-scope .cs-diff-val-empty {
@@ -317,7 +356,7 @@
   font-weight: 600;
 }
 
-/* Stat tile colors */
+/* Stat Tile Variants */
 .cs-scope .cs-stat-value-primary {
   color: var(--cs-primary);
 }
@@ -328,7 +367,6 @@
   color: var(--cs-success);
 }
 
-/* Responsive Breakpoints */
 @media (max-width: 768px) {
   .cs-scope .cs-preview-toolbar {
     flex-direction: column;

@@ -206,7 +206,7 @@ export function PreviewStep({
 
   return (
     <section className="cs-card cs-stack-md" aria-labelledby="step4-title">
-      {/* Top Header */}
+      {/* Header */}
       <div className="cs-preview-header">
         <div>
           <h2 id="step4-title" className="cs-card-title">
@@ -218,7 +218,7 @@ export function PreviewStep({
         </div>
       </div>
 
-      {/* KPI Stats Tiles */}
+      {/* KPI Stats */}
       <div className="cs-stats-grid">
         <div className="cs-stat-tile">
           <div className="cs-label">Total Matched Cards</div>
@@ -263,7 +263,7 @@ export function PreviewStep({
         </div>
       )}
 
-      {/* Search and Action Toolbar */}
+      {/* Toolbar */}
       <div className="cs-preview-toolbar">
         <div className="cs-filter-tabs">
           <button
@@ -387,7 +387,10 @@ export function PreviewStep({
                       }
                     }}
                   >
-                    <span className="cs-diff-card-title">
+                    <span
+                      className="cs-diff-card-title"
+                      title={cardDiff.cardName?.trim() || '(Untitled Card)'}
+                    >
                       {cardDiff.cardName?.trim() || '(Untitled Card)'}
                     </span>
                     {cardDiff.cardShortId && (
@@ -447,21 +450,34 @@ export function PreviewStep({
                             {field.fieldLabel}
                           </div>
 
-                          <div className="cs-diff-val-box cs-diff-val-before">
+                          <div
+                            className="cs-diff-val-box cs-diff-val-before"
+                            title={field.currentValue || ''}
+                          >
                             {formatValue(field.currentValue)}
                           </div>
 
-                          <div className="cs-diff-arrow">
+                          <div
+                            className={`cs-diff-arrow ${
+                              field.hasChanged ? 'cs-diff-arrow-changed' : ''
+                            }`}
+                          >
                             {field.hasChanged ? <ArrowRightIcon /> : '—'}
                           </div>
 
-                          <div className="cs-diff-val-box cs-diff-val-after">
+                          {/* Green style ONLY applied when field.hasChanged is true */}
+                          <div
+                            className={`cs-diff-val-box ${
+                              field.hasChanged ? 'cs-diff-val-after' : 'cs-diff-val-unchanged'
+                            }`}
+                            title={field.newValue || ''}
+                          >
                             {field.hasChanged ? (
                               formatValue(field.newValue)
                             ) : (
                               <span className="cs-diff-val-same">
                                 {formatValue(field.currentValue)}{' '}
-                                <small>(unchanged)</small>
+                                <span className="cs-diff-tag-unchanged">(unchanged)</span>
                               </span>
                             )}
                           </div>
