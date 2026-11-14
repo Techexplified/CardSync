@@ -86,4 +86,42 @@ export interface PreviewSummary {
   cardDiffs: CardDiff[];
 }
 
+export type ExecutionStatus =
+  | 'pending'
+  | 'updating'
+  | 'success'
+  | 'failed'
+  | 'skipped';
+
+export interface ExecutionCardResult {
+  cardId: string;
+  cardName: string;
+  cardShortId?: number;
+  rowNumber: number;
+  status: ExecutionStatus;
+  updatedFields: string[];
+  error?: string;
+  executedAt: string;
+}
+
+export interface ExecutionLogEntry {
+  id: string;
+  timestamp: string;
+  level: 'info' | 'success' | 'error' | 'warn';
+  message: string;
+  cardName?: string;
+}
+
+export interface ExecutionReport {
+  startedAt: string;
+  finishedAt: string;
+  durationMs: number;
+  totalCards: number;
+  successCount: number;
+  failedCount: number;
+  skippedCount: number;
+  results: ExecutionCardResult[];
+}
+
+
 

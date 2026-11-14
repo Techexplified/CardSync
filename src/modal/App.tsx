@@ -15,6 +15,7 @@ import { fetchBoardSnapshot } from '../services/trelloBoard';
 import type { CardDiff, ColumnMappingConfig, ParsedCsvData } from '../types/cardsync';
 import type { BoardSnapshot, TrelloBoard, TrelloClient } from '../types/trello';
 import type { ValidatedRow } from '../core/validator';
+import { ExecutionReportStep } from './components/ExecutionReportStep';
 import { MappingStep } from './components/MappingStep';
 import { PreviewStep } from './components/PreviewStep';
 import { UploadStep } from './components/UploadStep';
@@ -258,6 +259,14 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
   async function handleRefreshBoard() {
     if (!board || auth?.state !== 'authorized') return;
     await loadBoardData(board, auth.token);
+  }
+
+  function handleResetWizard() {
+    setCsvData(null);
+    setMappingConfig(null);
+    setValidatedRows(null);
+    setSelectedCardsToSync(null);
+    setActiveStep(0);
   }
 
   if (!t) {
@@ -544,23 +553,14 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
           auth?.state === 'authorized' &&
           activeStep === 4 &&
           selectedCardsToSync && (
-            <section className="cs-card cs-stack-md">
-              <div className="cs-row">
-                <div>
-                  <h2 className="cs-card-title">Step 5: Execution Report</h2>
-                  <p className="cs-card-desc">
-                    Ready to update <strong>{selectedCardsToSync.length} cards</strong> on your board via Trello&apos;s REST API.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="cs-btn"
-                  onClick={() => setActiveStep(3)}
-                >
-                  &larr; Back to Preview
-                </button>
-              </div>
-            </section>
+            <ExecutionReportStep
+              selectedCards={selectedCardsToSync}
+              token={auth.token}
+              boardName={board?.name}
+              onBack={() => setActiveStep(3)}
+              onReset={handleResetWizard}
+              onRefreshBoard={handleRefreshBoard}
+            />
           )}
       </div>
     </main>

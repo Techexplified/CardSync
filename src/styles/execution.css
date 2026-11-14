@@ -3,96 +3,256 @@
    ========================================================================== */
 
 /* Progress Bar Container */
-.cs-progress-wrap {
+.cs-scope .cs-progress-wrap {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin: 10px 0;
+  background: var(--cs-surface-subtle);
+  border: 1px solid var(--cs-border);
+  border-radius: 8px;
+  padding: 14px 16px;
 }
 
-.cs-progress-bar {
+.cs-scope .cs-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cs-text);
+}
+
+.cs-scope .cs-progress-bar {
   width: 100%;
-  height: 12px;
+  height: 10px;
   border-radius: 999px;
-  background: #e9ecef;
+  background: #dfe1e6;
   overflow: hidden;
   position: relative;
 }
 
-.cs-progress-fill {
+.cs-scope .cs-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #0c66e4, #0055cc);
   border-radius: 999px;
   transition: width 0.25s ease;
 }
 
-.cs-progress-fill-success {
+.cs-scope .cs-progress-fill-done {
   background: linear-gradient(90deg, #1f845a, #22a06b);
 }
 
-.cs-progress-meta {
+.cs-scope .cs-progress-fill-failed {
+  background: linear-gradient(90deg, #ae2e24, #d32f2f);
+}
+
+/* Pre-execution Prompt Hero */
+.cs-scope .cs-exec-hero {
+  border: 1.5px solid #d0e2ff;
+  background: #f0f7ff;
+  border-radius: 10px;
+  padding: 24px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--cs-text-secondary);
-  font-weight: 500;
-}
-
-/* Live Execution Log Window */
-.cs-execution-logs {
-  border: 1px solid var(--cs-border);
-  border-radius: 8px;
-  background: #ffffff;
-  max-height: 280px;
-  overflow-y: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 12px;
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.cs-log-entry {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 3px 0;
-  border-bottom: 1px solid #f4f5f7;
-}
-
-.cs-log-entry:last-child {
-  border-bottom: none;
-}
-
-.cs-log-time {
-  color: var(--cs-text-muted);
-  font-size: 11px;
-  flex-shrink: 0;
-}
-
-.cs-log-success {
-  color: #1f845a;
-}
-
-.cs-log-error {
-  color: #ae2e24;
-  font-weight: 600;
-}
-
-.cs-log-info {
-  color: #0c66e4;
-}
-
-/* Report Summary Card */
-.cs-report-card {
-  background: #ffffff;
-  border: 1px solid var(--cs-border);
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
+  text-align: center;
   gap: 12px;
 }
 
+.cs-scope .cs-exec-hero-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #b3d4ff;
+  color: var(--cs-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-scope .cs-exec-hero-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #09326c;
+}
+
+.cs-scope .cs-exec-hero-desc {
+  font-size: 13px;
+  color: #172b4d;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+/* Live Execution Log Terminal */
+.cs-scope .cs-terminal-card {
+  border: 1px solid var(--cs-border);
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.cs-scope .cs-terminal-header {
+  background: #f7f8f9;
+  border-bottom: 1px solid var(--cs-border);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cs-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cs-scope .cs-terminal-body {
+  background: #091e4208;
+  max-height: 240px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cs-scope .cs-log-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.cs-scope .cs-log-time {
+  color: var(--cs-text-muted);
+  font-size: 11px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-scope .cs-log-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.cs-scope .cs-log-badge-info {
+  background: #e9f2ff;
+  color: #0c66e4;
+}
+
+.cs-scope .cs-log-badge-success {
+  background: #dcfff1;
+  color: #1f845a;
+}
+
+.cs-scope .cs-log-badge-error {
+  background: #ffeceb;
+  color: #ae2e24;
+}
+
+.cs-scope .cs-log-badge-warn {
+  background: #fff7d6;
+  color: #974f0c;
+}
+
+.cs-scope .cs-log-card-name {
+  font-weight: 600;
+  color: var(--cs-text);
+}
+
+.cs-scope .cs-log-msg {
+  color: var(--cs-text-secondary);
+}
+
+/* Results Table */
+.cs-scope .cs-results-table-wrap {
+  border: 1px solid var(--cs-border);
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 360px;
+  background: #ffffff !important;
+}
+
+.cs-scope .cs-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background-color: #ffffff !important;
+  color: var(--cs-text) !important;
+}
+
+.cs-scope .cs-results-table th,
+.cs-scope .cs-results-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ebecf0;
+  color: var(--cs-text) !important;
+  vertical-align: middle;
+}
+
+.cs-scope .cs-results-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #f7f8f9 !important;
+  font-weight: 700;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cs-text-secondary) !important;
+  border-bottom: 1px solid var(--cs-border);
+}
+
+.cs-scope .cs-results-table tbody tr:nth-child(odd) {
+  background-color: #ffffff !important;
+}
+
+.cs-scope .cs-results-table tbody tr:nth-child(even) {
+  background-color: #f9fafb !important;
+}
+
+.cs-scope .cs-results-table tbody tr:hover {
+  background-color: #f0f7ff !important;
+}
+
+.cs-scope .cs-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cs-scope .cs-status-chip-success {
+  background: #dcfff1;
+  color: #1f845a;
+}
+
+.cs-scope .cs-status-chip-failed {
+  background: #ffeceb;
+  color: #ae2e24;
+}
+
+.cs-scope .cs-status-chip-skipped {
+  background: #f1f2f4;
+  color: #626f86;
+}
+
+.cs-scope .cs-status-chip-updating {
+  background: #e9f2ff;
+  color: #0c66e4;
+}
