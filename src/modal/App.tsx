@@ -12,10 +12,11 @@ import {
   type AuthStatus,
 } from '../services/trelloAuth';
 import { fetchBoardSnapshot } from '../services/trelloBoard';
-import type { ColumnMappingConfig, ParsedCsvData } from '../types/cardsync';
+import type { CardDiff, ColumnMappingConfig, ParsedCsvData } from '../types/cardsync';
 import type { BoardSnapshot, TrelloBoard, TrelloClient } from '../types/trello';
 import type { ValidatedRow } from '../core/validator';
 import { MappingStep } from './components/MappingStep';
+import { PreviewStep } from './components/PreviewStep';
 import { UploadStep } from './components/UploadStep';
 import { ValidationStep } from './components/ValidationStep';
 
@@ -68,6 +69,7 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
   const [mappingConfig, setMappingConfig] = useState<ColumnMappingConfig | null>(null);
   const [savedMapping, setSavedMapping] = useState<ColumnMappingConfig | null>(null);
   const [validatedRows, setValidatedRows] = useState<ValidatedRow[] | null>(null);
+  const [selectedCardsToSync, setSelectedCardsToSync] = useState<CardDiff[] | null>(null);
 
   const [manualToken, setManualToken] = useState('');
   const [showManual, setShowManual] = useState(false);
@@ -525,20 +527,37 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
           mappingConfig &&
           snapshot &&
           validatedRows && (
+            <PreviewStep
+              validatedRows={validatedRows}
+              csvData={csvData}
+              mappingConfig={mappingConfig}
+              snapshot={snapshot}
+              onBack={() => setActiveStep(2)}
+              onContinue={(selectedCards) => {
+                setSelectedCardsToSync(selectedCards);
+                setActiveStep(4);
+              }}
+            />
+          )}
+
+        {!loading &&
+          auth?.state === 'authorized' &&
+          activeStep === 4 &&
+          selectedCardsToSync && (
             <section className="cs-card cs-stack-md">
               <div className="cs-row">
                 <div>
-                  <h2 className="cs-card-title">Step 4: Before &amp; After Preview</h2>
+                  <h2 className="cs-card-title">Step 5: Execution Report</h2>
                   <p className="cs-card-desc">
-                    Ready to preview changes for <strong>{validatedRows.length} cards</strong> before applying updates to Trello.
+                    Ready to update <strong>{selectedCardsToSync.length} cards</strong> on your board via Trello&apos;s REST API.
                   </p>
                 </div>
                 <button
                   type="button"
                   className="cs-btn"
-                  onClick={() => setActiveStep(2)}
+                  onClick={() => setActiveStep(3)}
                 >
-                  &larr; Back to Validation
+                  &larr; Back to Preview
                 </button>
               </div>
             </section>

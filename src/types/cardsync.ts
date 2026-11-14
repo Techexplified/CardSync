@@ -49,3 +49,41 @@ export interface MappingValidationResult {
   errors: string[];
 }
 
+export interface FieldDiff {
+  fieldKey: TrelloFieldKey;
+  fieldLabel: string;
+  currentValue: string;
+  newValue: string;
+  hasChanged: boolean;
+}
+
+export interface CardDiff {
+  cardId: string;
+  cardName: string;
+  cardShortId?: number;
+  rowNumber: number;
+  selected: boolean;
+  fieldDiffs: FieldDiff[];
+  hasChanges: boolean;
+  changeCount: number;
+  /** Payload ready for PUT /1/cards/{id} execution */
+  updatePayload: {
+    name?: string;
+    desc?: string;
+    due?: string | null;
+    idList?: string;
+    idLabels?: string[];
+    idMembers?: string[];
+  };
+}
+
+export interface PreviewSummary {
+  totalCards: number;
+  changedCardsCount: number;
+  unchangedCardsCount: number;
+  selectedCount: number;
+  totalFieldChanges: number;
+  cardDiffs: CardDiff[];
+}
+
+

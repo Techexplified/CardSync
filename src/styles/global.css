@@ -965,6 +965,108 @@ body {
   color: #0052cc;
 }
 
+/* Diff Preview Styles */
+.cs-diff-card {
+  border: 1.5px solid var(--cs-border);
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cs-diff-card-selected {
+  border-color: #85b8ff;
+  box-shadow: 0 1px 4px rgba(12, 102, 228, 0.08);
+}
+
+.cs-diff-card-nochange {
+  opacity: 0.85;
+  background: #fafbfc;
+}
+
+.cs-diff-card-header {
+  padding: 10px 14px;
+  background: #f7f8f9;
+  border-bottom: 1px solid var(--cs-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cs-diff-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cs-diff-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--cs-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.cs-diff-table th,
+.cs-diff-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ebecf0;
+  vertical-align: top;
+  text-align: left;
+}
+
+.cs-diff-table th {
+  background: #fdfdfd;
+  color: var(--cs-text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.cs-diff-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cs-diff-val-old {
+  color: #5e6c84;
+  background: #f4f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  word-break: break-word;
+}
+
+.cs-diff-val-new {
+  color: #145938;
+  background: #e3fcef;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  word-break: break-word;
+}
+
+.cs-diff-val-same {
+  color: #8c9bab;
+  font-style: italic;
+}
+
+.cs-diff-arrow {
+  color: #1f845a;
+  font-weight: 700;
+  margin: 0 4px;
+}
+
 /* Standalone Status Page */
 .cs-status-page {
   min-height: 100vh;
