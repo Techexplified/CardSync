@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Step 1: CSV Upload & Board Snapshot Styles
+   ========================================================================== */
+
+/* Board Stats Grid */
+.cs-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cs-stat-tile {
+  background: var(--cs-surface-subtle);
+  border: 1px solid var(--cs-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.cs-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cs-text);
+  line-height: 1.2;
+}
+
+/* Drag & Drop Upload Zone */
+.cs-dropzone {
+  border: 2px dashed #b3bac5;
+  border-radius: 10px;
+  padding: 34px 24px;
+  text-align: center;
+  background: #fafbfc;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.cs-dropzone:hover,
+.cs-dropzone-active {
+  border-color: var(--cs-primary);
+  background: var(--cs-primary-soft);
+}
+
+.cs-dropzone-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  color: var(--cs-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.cs-dropzone-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cs-text);
+}
+
+.cs-dropzone-sub {
+  font-size: 12px;
+  color: var(--cs-text-muted);
+  max-width: 460px;
+}
+
+/* File Summary Bar */
+.cs-file-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--cs-surface-subtle);
+  border: 1px solid var(--cs-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+/* CSV Preview Table - insulated from Trello power-up.min.css overrides */
+.cs-scope .cs-table-wrap {
+  overflow: auto;
+  max-height: 340px;
+  border: 1px solid var(--cs-border);
+  border-radius: 8px;
+  background: #ffffff !important;
+}
+
+.cs-scope table.cs-table,
+.cs-scope .cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background-color: #ffffff !important;
+  color: var(--cs-text) !important;
+}
+
+.cs-scope .cs-table th,
+.cs-scope .cs-table td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid #ebecf0;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--cs-text) !important;
+  background-color: transparent;
+}
+
+.cs-scope .cs-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #f7f8f9 !important;
+  font-weight: 700;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cs-text-secondary) !important;
+  border-bottom: 1px solid var(--cs-border);
+}
+
+/* Explicit alternating row colors overriding external Trello table rules */
+.cs-scope .cs-table tbody tr,
+.cs-scope .cs-table tbody tr:nth-child(odd) {
+  background-color: #ffffff !important;
+  color: var(--cs-text) !important;
+}
+
+.cs-scope .cs-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa !important;
+  color: var(--cs-text) !important;
+}
+
+.cs-scope .cs-table tbody tr:hover,
+.cs-scope .cs-table tbody tr:hover td {
+  background-color: #e9f2ff !important;
+}
+
+.cs-scope .cs-table tbody tr td {
+  color: var(--cs-text) !important;
+}
+
+.cs-scope .cs-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cs-scope .cs-row-num {
+  color: var(--cs-text-muted) !important;
+  font-variant-numeric: tabular-nums;
+  width: 56px;
+  font-weight: 600;
+}
+
+.cs-scope .cs-cell-empty {
+  color: #8c9bab !important;
+}
+
+@media (max-width: 760px) {
+  .cs-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

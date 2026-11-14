@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { validateRows, type ValidatedRow } from '../../core/validator';
 import type { ColumnMappingConfig, ParsedCsvData } from '../../types/cardsync';
 import type { BoardSnapshot } from '../../types/trello';
+import '../../styles/validation.css';
 
 interface ValidationStepProps {
   csvData: ParsedCsvData;

@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import { exportBoardTemplateCsv, parseCsvFile } from '../../core/csv';
 import type { ParsedCsvData } from '../../types/cardsync';
 import type { BoardSnapshot } from '../../types/trello';
+import '../../styles/upload.css';
 
 interface UploadStepProps {
   snapshot: BoardSnapshot | null;

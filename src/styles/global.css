@@ -394,14 +394,55 @@ body {
   color: #ffffff;
 }
 
-/* Board Stats */
-.cs-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
+/* Common Filter Tabs (used in Validation and Preview) */
+.cs-filter-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
+.cs-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--cs-border);
+  background: #ffffff;
+  color: var(--cs-text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-filter-btn:hover {
+  background: var(--cs-surface-subtle);
+  border-color: var(--cs-border-strong);
+}
+
+.cs-filter-btn-active {
+  background: #f0f7ff !important;
+  border-color: var(--cs-primary) !important;
+  color: var(--cs-primary) !important;
+}
+
+.cs-filter-count {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.cs-filter-btn-active .cs-filter-count {
+  background: var(--cs-primary);
+  color: #ffffff;
+}
+
+/* Common Stat Tiles */
 .cs-stat-tile {
   background: var(--cs-surface-subtle);
   border: 1px solid var(--cs-border);
@@ -414,145 +455,6 @@ body {
   font-weight: 700;
   color: var(--cs-text);
   line-height: 1.2;
-}
-
-/* Dropzone */
-.cs-dropzone {
-  border: 2px dashed #b3bac5;
-  border-radius: 10px;
-  padding: 34px 24px;
-  text-align: center;
-  background: #fafbfc;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.cs-dropzone:hover,
-.cs-dropzone-active {
-  border-color: var(--cs-primary);
-  background: var(--cs-primary-soft);
-}
-
-.cs-dropzone-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  background: var(--cs-surface);
-  border: 1px solid var(--cs-border);
-  color: var(--cs-primary);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2px;
-}
-
-.cs-dropzone-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--cs-text);
-}
-
-.cs-dropzone-sub {
-  font-size: 12px;
-  color: var(--cs-text-muted);
-  max-width: 460px;
-}
-
-/* File Summary Bar */
-.cs-file-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  background: var(--cs-surface-subtle);
-  border: 1px solid var(--cs-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-}
-
-/* Data Table - insulated from Trello power-up.min.css overrides */
-.cs-scope .cs-table-wrap {
-  overflow: auto;
-  max-height: 340px;
-  border: 1px solid var(--cs-border);
-  border-radius: 8px;
-  background: #ffffff !important;
-}
-
-.cs-scope table.cs-table,
-.cs-scope .cs-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12.5px;
-  background-color: #ffffff !important;
-  color: var(--cs-text) !important;
-}
-
-.cs-scope .cs-table th,
-.cs-scope .cs-table td {
-  text-align: left;
-  padding: 9px 12px;
-  border-bottom: 1px solid #ebecf0;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--cs-text) !important;
-  background-color: transparent;
-}
-
-.cs-scope .cs-table th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background-color: #f7f8f9 !important;
-  font-weight: 700;
-  font-size: 11.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--cs-text-secondary) !important;
-  border-bottom: 1px solid var(--cs-border);
-}
-
-/* Explicit alternating row colors overriding external Trello table rules */
-.cs-scope .cs-table tbody tr,
-.cs-scope .cs-table tbody tr:nth-child(odd) {
-  background-color: #ffffff !important;
-  color: var(--cs-text) !important;
-}
-
-.cs-scope .cs-table tbody tr:nth-child(even) {
-  background-color: #f8f9fa !important;
-  color: var(--cs-text) !important;
-}
-
-.cs-scope .cs-table tbody tr:hover,
-.cs-scope .cs-table tbody tr:hover td {
-  background-color: #e9f2ff !important;
-}
-
-.cs-scope .cs-table tbody tr td {
-  color: var(--cs-text) !important;
-}
-
-.cs-scope .cs-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.cs-scope .cs-row-num {
-  color: var(--cs-text-muted) !important;
-  font-variant-numeric: tabular-nums;
-  width: 56px;
-  font-weight: 600;
-}
-
-.cs-scope .cs-cell-empty {
-  color: #8c9bab !important;
 }
 
 /* Auth / Empty Hero Box */
@@ -611,462 +513,6 @@ body {
   box-shadow: 0 0 0 1px var(--cs-primary);
 }
 
-/* Select Inputs */
-.cs-select {
-  width: 100%;
-  min-height: 36px;
-  padding: 6px 28px 6px 10px;
-  border: 1px solid var(--cs-border-strong);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--cs-text);
-  background: var(--cs-surface)
-    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2344546f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right 8px center;
-  appearance: none;
-  cursor: pointer;
-}
-
-.cs-select:focus {
-  outline: none;
-  border-color: var(--cs-primary);
-  box-shadow: 0 0 0 1px var(--cs-primary);
-}
-
-.cs-select-id {
-  border-color: #0c66e4;
-  background-color: #f0f7ff;
-  font-weight: 600;
-  color: #0055cc;
-}
-
-.cs-select-updatable {
-  border-color: #1f845a;
-  background-color: #f3fcf8;
-  font-weight: 600;
-  color: #166b47;
-}
-
-.cs-select-ignore {
-  border-color: var(--cs-border);
-  color: var(--cs-text-muted);
-}
-
-/* Sample Value Chips in Mapping Table */
-.cs-samples-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-}
-
-.cs-sample-chip {
-  display: inline-block;
-  background: #f1f2f4;
-  border: 1px solid #dcdfe4;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
-  color: #172b4d;
-  max-width: 190px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cs-sample-chip-empty {
-  color: #8c9bab;
-  font-style: italic;
-  background: transparent;
-  border-style: dashed;
-}
-
-/* Sync Option Cards (Merge vs Replace) */
-.cs-sync-card {
-  background: var(--cs-surface);
-  border: 1px solid var(--cs-border);
-  border-radius: 8px;
-  padding: 14px 16px;
-}
-
-.cs-sync-title {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--cs-text);
-  margin-bottom: 2px;
-}
-
-.cs-sync-desc {
-  font-size: 12px;
-  color: var(--cs-text-secondary);
-  margin-bottom: 10px;
-}
-
-.cs-sync-options-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-@media (max-width: 600px) {
-  .cs-sync-options-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-.cs-sync-choice {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1.5px solid var(--cs-border);
-  border-radius: 7px;
-  background: #ffffff;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s ease;
-  user-select: none;
-  width: 100%;
-}
-
-.cs-sync-choice:hover {
-  border-color: #85b8ff;
-  background: #f8fbff;
-}
-
-.cs-sync-choice-active {
-  border-color: var(--cs-primary) !important;
-  background: #f0f7ff !important;
-}
-
-.cs-sync-radio-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1.5px solid var(--cs-border-strong);
-  margin-top: 1px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.cs-sync-choice-active .cs-sync-radio-dot {
-  border-color: var(--cs-primary);
-  background: var(--cs-primary);
-}
-
-.cs-sync-radio-inner {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ffffff;
-}
-
-.cs-sync-choice-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--cs-text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.cs-sync-badge-rec {
-  background: #dcfff1;
-  color: #1f845a;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 999px;
-  letter-spacing: 0.02em;
-}
-
-.cs-sync-choice-detail {
-  font-size: 11.5px;
-  color: var(--cs-text-secondary);
-  margin-top: 2px;
-  line-height: 1.4;
-}
-
-.cs-mapping-header-pill {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Validation Filter Tabs */
-.cs-filter-tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.cs-filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--cs-border);
-  background: #ffffff;
-  color: var(--cs-text-secondary);
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.cs-filter-btn:hover {
-  background: var(--cs-surface-subtle);
-  border-color: var(--cs-border-strong);
-}
-
-.cs-filter-btn-active {
-  background: #f0f7ff !important;
-  border-color: var(--cs-primary) !important;
-  color: var(--cs-primary) !important;
-}
-
-.cs-filter-count {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 999px;
-  font-size: 11px;
-  background: #e9ecef;
-  color: #495057;
-}
-
-.cs-filter-btn-active .cs-filter-count {
-  background: var(--cs-primary);
-  color: #ffffff;
-}
-
-/* Matched Card Display */
-.cs-matched-card {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cs-matched-card-name {
-  font-weight: 600;
-  color: var(--cs-text);
-  font-size: 12.5px;
-}
-
-.cs-matched-card-meta {
-  font-size: 11px;
-  color: var(--cs-text-muted);
-}
-
-/* Validation Table Enhancements */
-.cs-scope .cs-table-validation {
-  width: 100%;
-}
-
-.cs-scope .cs-table-validation th,
-.cs-scope .cs-table-validation td {
-  max-width: none !important;
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  word-break: break-word !important;
-  vertical-align: top;
-  padding: 11px 14px;
-}
-
-.cs-scope .cs-table-validation td.cs-row-num {
-  vertical-align: top;
-  padding-top: 13px;
-  font-weight: 700;
-  color: var(--cs-text-muted);
-}
-
-.cs-scope .cs-row-error {
-  background-color: #fff9f9 !important;
-}
-
-.cs-scope .cs-row-error:hover {
-  background-color: #fff2f2 !important;
-}
-
-/* Issue List */
-.cs-issue-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.cs-issue-badge {
-  display: flex;
-  align-items: flex-start;
-  gap: 7px;
-  font-size: 12px;
-  line-height: 1.4;
-  border-radius: 6px;
-  padding: 5px 9px;
-  word-break: break-word;
-}
-
-.cs-issue-badge-error {
-  background: #ffeceb;
-  color: #a02018;
-  border: 1px solid #fecbc7;
-}
-
-.cs-issue-badge-warning {
-  background: #fff8eb;
-  color: #8c5208;
-  border: 1px solid #ffe3b0;
-}
-
-.cs-issue-icon {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-
-.cs-issue-tag {
-  display: inline-block;
-  font-weight: 700;
-  margin-right: 4px;
-  text-transform: capitalize;
-}
-
-/* Help Box when 0 matches */
-.cs-help-box {
-  background: #f0f7ff;
-  border: 1px solid #b3d4ff;
-  border-radius: 8px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: #09326c;
-}
-
-.cs-help-box-title {
-  font-weight: 700;
-  font-size: 13.5px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #0052cc;
-}
-
-/* Diff Preview Styles */
-.cs-diff-card {
-  border: 1.5px solid var(--cs-border);
-  border-radius: 8px;
-  background: #ffffff;
-  overflow: hidden;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.cs-diff-card-selected {
-  border-color: #85b8ff;
-  box-shadow: 0 1px 4px rgba(12, 102, 228, 0.08);
-}
-
-.cs-diff-card-nochange {
-  opacity: 0.85;
-  background: #fafbfc;
-}
-
-.cs-diff-card-header {
-  padding: 10px 14px;
-  background: #f7f8f9;
-  border-bottom: 1px solid var(--cs-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.cs-diff-card-title-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.cs-diff-card-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--cs-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cs-diff-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-
-.cs-diff-table th,
-.cs-diff-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid #ebecf0;
-  vertical-align: top;
-  text-align: left;
-}
-
-.cs-diff-table th {
-  background: #fdfdfd;
-  color: var(--cs-text-secondary);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 700;
-}
-
-.cs-diff-table tr:last-child td {
-  border-bottom: none;
-}
-
-.cs-diff-val-old {
-  color: #5e6c84;
-  background: #f4f5f7;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: inline-block;
-  word-break: break-word;
-}
-
-.cs-diff-val-new {
-  color: #145938;
-  background: #e3fcef;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: inline-block;
-  word-break: break-word;
-}
-
-.cs-diff-val-same {
-  color: #8c9bab;
-  font-style: italic;
-}
-
-.cs-diff-arrow {
-  color: #1f845a;
-  font-weight: 700;
-  margin: 0 4px;
-}
-
 /* Standalone Status Page */
 .cs-status-page {
   min-height: 100vh;
@@ -1099,10 +545,6 @@ body {
   }
 
   .cs-stepper {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .cs-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

@@ -1,0 +1,179 @@
+/* ==========================================================================
+   Step 4: Before & After Diff Preview Styles
+   ========================================================================== */
+
+/* Diff Card Container */
+.cs-scope .cs-diff-card {
+  border: 1.5px solid var(--cs-border);
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  margin-bottom: 8px;
+}
+
+.cs-scope .cs-diff-card-selected {
+  border-color: #0c66e4;
+  box-shadow: 0 1px 3px rgba(12, 102, 228, 0.12);
+}
+
+.cs-scope .cs-diff-card-nochange {
+  border-color: #e2e5e8;
+  background: #fbfcfd;
+}
+
+/* Card Header with Checkbox and Info */
+.cs-scope .cs-diff-card-header {
+  padding: 10px 14px;
+  background: #f7f8f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  user-select: none;
+  min-height: 48px;
+  flex-wrap: wrap;
+}
+
+.cs-scope .cs-diff-card-header-haschanges {
+  background: #f0f7ff;
+  border-bottom: 1px solid #d0e2ff;
+}
+
+/* Insulated Custom Checkbox */
+.cs-scope .cs-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  cursor: pointer;
+  flex: 1 1 auto;
+}
+
+.cs-scope .cs-custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid #85b8ff;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-scope .cs-custom-checkbox-checked {
+  background: #0c66e4;
+  border-color: #0c66e4;
+  color: #ffffff;
+}
+
+.cs-scope .cs-diff-card-title-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.cs-scope .cs-diff-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--cs-text);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* Diff Body and Grid Rows */
+.cs-scope .cs-diff-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #ffffff;
+  border-top: 1px solid var(--cs-border);
+}
+
+.cs-scope .cs-diff-grid-header {
+  display: grid;
+  grid-template-columns: 140px 1fr 24px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cs-text-secondary);
+}
+
+.cs-scope .cs-diff-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 24px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f7f8f9;
+  font-size: 12.5px;
+}
+
+.cs-scope .cs-diff-row-changed {
+  background: #f4faf6;
+  border: 1px solid #d3f3e3;
+}
+
+.cs-scope .cs-diff-field-name {
+  font-weight: 700;
+  color: var(--cs-text);
+  font-size: 12px;
+}
+
+.cs-scope .cs-diff-val-before {
+  color: #626f86;
+  background: #ffffff;
+  border: 1px solid #dcdfe4;
+  border-radius: 4px;
+  padding: 4px 8px;
+  word-break: break-word;
+}
+
+.cs-scope .cs-diff-arrow {
+  color: #1f845a;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cs-scope .cs-diff-val-after {
+  color: #145938;
+  background: #dcfff1;
+  border: 1px solid #baf3db;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.cs-scope .cs-diff-val-same {
+  color: #8c9bab;
+  font-style: italic;
+  padding: 4px 8px;
+}
+
+@media (max-width: 680px) {
+  .cs-scope .cs-diff-grid-header {
+    display: none;
+  }
+
+  .cs-scope .cs-diff-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .cs-scope .cs-diff-arrow {
+    display: none;
+  }
+}
+

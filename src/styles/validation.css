@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Step 3: Data Validation & Card Matching Styles
+   ========================================================================== */
+
+/* Filter Tabs */
+.cs-filter-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cs-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--cs-border);
+  background: #ffffff;
+  color: var(--cs-text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-filter-btn:hover {
+  background: var(--cs-surface-subtle);
+  border-color: var(--cs-border-strong);
+}
+
+.cs-filter-btn-active {
+  background: #f0f7ff !important;
+  border-color: var(--cs-primary) !important;
+  color: var(--cs-primary) !important;
+}
+
+.cs-filter-count {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.cs-filter-btn-active .cs-filter-count {
+  background: var(--cs-primary);
+  color: #ffffff;
+}
+
+/* Matched Card Display */
+.cs-matched-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-matched-card-name {
+  font-weight: 600;
+  color: var(--cs-text);
+  font-size: 12.5px;
+}
+
+.cs-matched-card-meta {
+  font-size: 11px;
+  color: var(--cs-text-muted);
+}
+
+/* Validation Table Layout */
+.cs-scope .cs-table-validation {
+  width: 100%;
+}
+
+.cs-scope .cs-table-validation th,
+.cs-scope .cs-table-validation td {
+  max-width: none !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: break-word !important;
+  vertical-align: top;
+  padding: 11px 14px;
+}
+
+.cs-scope .cs-table-validation td.cs-row-num {
+  vertical-align: top;
+  padding-top: 13px;
+  font-weight: 700;
+  color: var(--cs-text-muted);
+}
+
+.cs-scope .cs-row-error {
+  background-color: #fff9f9 !important;
+}
+
+.cs-scope .cs-row-error:hover {
+  background-color: #fff2f2 !important;
+}
+
+/* Validation Issues List & Badges */
+.cs-issue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cs-issue-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: 6px;
+  padding: 5px 9px;
+  word-break: break-word;
+}
+
+.cs-issue-badge-error {
+  background: #ffeceb;
+  color: #a02018;
+  border: 1px solid #fecbc7;
+}
+
+.cs-issue-badge-warning {
+  background: #fff8eb;
+  color: #8c5208;
+  border: 1px solid #ffe3b0;
+}
+
+.cs-issue-icon {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.cs-issue-tag {
+  display: inline-block;
+  font-weight: 700;
+  margin-right: 4px;
+  text-transform: capitalize;
+}
+
+/* Zero Matches Help Box */
+.cs-help-box {
+  background: #f0f7ff;
+  border: 1px solid #b3d4ff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #09326c;
+}
+
+.cs-help-box-title {
+  font-weight: 700;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #0052cc;
+}
+

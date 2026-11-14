@@ -10,6 +10,7 @@ import type {
   ParsedCsvData,
   TrelloFieldKey,
 } from '../../types/cardsync';
+import '../../styles/mapping.css';
 
 interface MappingStepProps {
   csvData: ParsedCsvData;
