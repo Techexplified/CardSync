@@ -38,6 +38,32 @@ function CheckIcon() {
   );
 }
 
+function ArrowRightIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
+
+function formatValue(val: string | null | undefined) {
+  if (val === null || val === undefined || val === '') {
+    return <span className="cs-diff-val-empty">(empty)</span>;
+  }
+  return val;
+}
+
 export function PreviewStep({
   validatedRows,
   csvData,
@@ -51,7 +77,6 @@ export function PreviewStep({
     [validatedRows, csvData, mappingConfig, snapshot]
   );
 
-  // Selection state keyed by cardId (default: only cards with changes are selected)
   const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     for (const d of initialDiffs) {
@@ -60,7 +85,6 @@ export function PreviewStep({
     return init;
   });
 
-  // Accordion state: Cards with changes are expanded by default; unchanged are collapsed
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     for (const d of initialDiffs) {
@@ -70,6 +94,7 @@ export function PreviewStep({
   });
 
   const [filter, setFilter] = useState<PreviewFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const diffsWithSelection = useMemo(() => {
     return initialDiffs.map((d) => ({
@@ -104,14 +129,26 @@ export function PreviewStep({
   );
 
   const filteredDiffs = useMemo(() => {
-    if (filter === 'changed') {
-      return diffsWithSelection.filter((d) => d.hasChanges);
-    }
-    if (filter === 'unchanged') {
-      return diffsWithSelection.filter((d) => !d.hasChanges);
-    }
-    return diffsWithSelection;
-  }, [diffsWithSelection, filter]);
+    return diffsWithSelection.filter((d) => {
+      if (filter === 'changed' && !d.hasChanges) return false;
+      if (filter === 'unchanged' && d.hasChanges) return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesName = d.cardName?.toLowerCase().includes(q);
+        const matchesId = d.cardShortId?.toString().toLowerCase().includes(q);
+        const matchesRow = d.rowNumber?.toString() === q;
+        const matchesFields = d.fieldDiffs.some(
+          (f) =>
+            f.fieldLabel.toLowerCase().includes(q) ||
+            f.currentValue?.toLowerCase().includes(q) ||
+            f.newValue?.toLowerCase().includes(q)
+        );
+        return matchesName || matchesId || matchesRow || matchesFields;
+      }
+      return true;
+    });
+  }, [diffsWithSelection, filter, searchQuery]);
 
   function handleToggleCard(cardId: string) {
     setSelectedMap((prev) => ({
@@ -170,13 +207,13 @@ export function PreviewStep({
   return (
     <section className="cs-card cs-stack-md" aria-labelledby="step4-title">
       {/* Top Header */}
-      <div className="cs-row" style={{ alignItems: 'flex-start' }}>
+      <div className="cs-preview-header">
         <div>
           <h2 id="step4-title" className="cs-card-title">
-            Step 4: Before &amp; After Preview
+            Step 4: Review Proposed Updates
           </h2>
           <p className="cs-card-desc">
-            Compare existing card values against the new values from your spreadsheet. Check or uncheck individual cards to include or exclude them from the sync.
+            Verify before applying updates to Trello. Select which cards to update or uncheck those you wish to skip.
           </p>
         </div>
       </div>
@@ -190,64 +227,44 @@ export function PreviewStep({
 
         <div className="cs-stat-tile">
           <div className="cs-label">Cards With Changes</div>
-          <div className="cs-stat-value" style={{ color: 'var(--cs-primary)' }}>
+          <div className="cs-stat-value cs-stat-value-primary">
             {changedCardsCount}
           </div>
         </div>
 
         <div className="cs-stat-tile">
           <div className="cs-label">Unchanged (No-Op)</div>
-          <div className="cs-stat-value" style={{ color: 'var(--cs-text-muted)' }}>
+          <div className="cs-stat-value cs-stat-value-muted">
             {unchangedCardsCount}
           </div>
         </div>
 
         <div className="cs-stat-tile">
           <div className="cs-label">Selected To Update</div>
-          <div className="cs-stat-value" style={{ color: 'var(--cs-success)' }}>
+          <div className="cs-stat-value cs-stat-value-success">
             {selectedDiffs.length}
           </div>
         </div>
       </div>
 
-      {/* No-Op Helper Notice when 0 changes are detected */}
+      {/* Zero Changes Helper Notice */}
       {changedCardsCount === 0 && (
-        <div
-          className="cs-alert"
-          style={{
-            background: '#f0f7ff',
-            border: '1px solid #b3d4ff',
-            color: '#09326c',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            flexWrap: 'wrap',
-          }}
-        >
+        <div className="cs-alert cs-alert-info cs-preview-notice">
           <div>
-            <strong>Notice:</strong> All {diffsWithSelection.length} cards in your spreadsheet already match your Trello board. No changes were detected.
+            <strong>Notice:</strong> All cards in your spreadsheet already match your Trello board. No changes detected.
           </div>
           <button
             type="button"
             className="cs-btn cs-btn-sm"
             onClick={handleSelectAll}
           >
-            Select All Cards Anyway
+            Select All Anyway
           </button>
         </div>
       )}
 
-      {/* Filter and Quick-Select Toolbar */}
-      <div
-        className="cs-row"
-        style={{
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 10,
-        }}
-      >
+      {/* Search and Action Toolbar */}
+      <div className="cs-preview-toolbar">
         <div className="cs-filter-tabs">
           <button
             type="button"
@@ -272,13 +289,22 @@ export function PreviewStep({
           </button>
         </div>
 
-        <div className="cs-actions" style={{ gap: 6 }}>
+        <div className="cs-preview-search-box">
+          <input
+            type="search"
+            className="cs-input cs-preview-search"
+            placeholder="Search cards or fields..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="cs-actions cs-preview-quick-actions">
           {changedCardsCount > 0 && (
             <button
               type="button"
               className="cs-btn cs-btn-subtle cs-btn-sm"
               onClick={handleSelectOnlyChanged}
-              title="Select only cards with changes"
             >
               Select Only Changed
             </button>
@@ -297,6 +323,7 @@ export function PreviewStep({
           >
             Deselect All
           </button>
+          <div className="cs-divider-v" />
           <button
             type="button"
             className="cs-btn cs-btn-subtle cs-btn-sm"
@@ -315,21 +342,10 @@ export function PreviewStep({
       </div>
 
       {/* Cards Diff List */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-          maxHeight: 460,
-          overflowY: 'auto',
-          paddingRight: 4,
-        }}
-      >
+      <div className="cs-diff-container">
         {filteredDiffs.length === 0 ? (
-          <div className="cs-subbox" style={{ textAlign: 'center', padding: '30px 20px' }}>
-            <p style={{ color: 'var(--cs-text-secondary)', margin: 0 }}>
-              No cards found matching the current filter.
-            </p>
+          <div className="cs-subbox cs-diff-empty-state">
+            <p>No cards match your filter and search criteria.</p>
           </div>
         ) : (
           filteredDiffs.map((cardDiff) => {
@@ -341,80 +357,82 @@ export function PreviewStep({
 
             return (
               <div key={cardDiff.cardId} className={cardClass}>
-                {/* Card Header with Custom Checkbox */}
+                {/* Header */}
                 <div
                   className={`cs-diff-card-header ${
                     cardDiff.hasChanges ? 'cs-diff-card-header-haschanges' : ''
                   }`}
                 >
-                  <div className="cs-checkbox-wrapper">
-                    {/* Insulated Custom Checkbox */}
-                    <div
-                      className={`cs-custom-checkbox ${
-                        isChecked ? 'cs-custom-checkbox-checked' : ''
-                      }`}
-                      onClick={() => handleToggleCard(cardDiff.cardId)}
-                      role="checkbox"
-                      aria-checked={isChecked}
-                      tabIndex={0}
-                      onKeyDown={(e) => e.key === ' ' && handleToggleCard(cardDiff.cardId)}
-                      title={isChecked ? 'Exclude this card' : 'Include this card'}
-                    >
+                  <label className="cs-checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => handleToggleCard(cardDiff.cardId)}
+                      className="cs-checkbox-native"
+                    />
+                    <span className="cs-custom-checkbox">
                       {isChecked && <CheckIcon />}
-                    </div>
+                    </span>
+                  </label>
 
-                    <div
-                      className="cs-diff-card-title-group"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => handleToggleCard(cardDiff.cardId)}
-                    >
-                      <span className="cs-diff-card-title">
-                        {cardDiff.cardName?.trim() || '(Untitled Card)'}
+                  <div
+                    className="cs-diff-card-title-group"
+                    onClick={() => handleToggleExpand(cardDiff.cardId)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleExpand(cardDiff.cardId);
+                      }
+                    }}
+                  >
+                    <span className="cs-diff-card-title">
+                      {cardDiff.cardName?.trim() || '(Untitled Card)'}
+                    </span>
+                    {cardDiff.cardShortId && (
+                      <span className="cs-pill cs-pill-muted cs-diff-pill-id">
+                        #{cardDiff.cardShortId}
                       </span>
-                      {cardDiff.cardShortId && (
-                        <span className="cs-pill cs-pill-muted" style={{ fontSize: 11 }}>
-                          #{cardDiff.cardShortId}
-                        </span>
-                      )}
-                      <span style={{ fontSize: 11, color: 'var(--cs-text-muted)' }}>
-                        (Row {cardDiff.rowNumber})
-                      </span>
-                    </div>
+                    )}
+                    <span className="cs-diff-row-tag">
+                      Row {cardDiff.rowNumber}
+                    </span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div className="cs-diff-header-meta">
                     {cardDiff.hasChanges ? (
                       <span className="cs-pill cs-pill-success">
                         <span className="cs-dot" />
                         {cardDiff.changeCount} change{cardDiff.changeCount === 1 ? '' : 's'}
                       </span>
                     ) : (
-                      <span className="cs-pill cs-pill-muted">No changes (No-Op)</span>
+                      <span className="cs-pill cs-pill-muted">No changes</span>
                     )}
 
                     <button
                       type="button"
-                      className="cs-btn cs-btn-subtle cs-btn-sm"
+                      className="cs-btn cs-btn-subtle cs-btn-sm cs-diff-expand-btn"
                       onClick={() => handleToggleExpand(cardDiff.cardId)}
-                      style={{ padding: '4px 8px', fontSize: 11.5 }}
+                      aria-expanded={isExpanded}
                     >
                       {isExpanded ? 'Hide Fields ▲' : `View Fields (${cardDiff.fieldDiffs.length}) ▼`}
                     </button>
                   </div>
                 </div>
 
-                {/* Diff Grid Body (Expandable) */}
+                {/* Diff Body */}
                 {isExpanded && (
                   <div className="cs-diff-body">
                     <div className="cs-diff-grid-header">
-                      <div>Field</div>
-                      <div>Current (In Trello)</div>
-                      <div></div>
-                      <div>New Value (From CSV)</div>
+                      <span>Field</span>
+                      <span>Current in Trello</span>
+                      <span aria-hidden="true" />
+                      <span>New Value from CSV</span>
                     </div>
 
                     {cardDiff.fieldDiffs.length === 0 ? (
-                      <div style={{ color: 'var(--cs-text-muted)', fontSize: 12, padding: '8px 10px' }}>
+                      <div className="cs-diff-no-fields">
                         No fields mapped for update on this card.
                       </div>
                     ) : (
@@ -422,28 +440,29 @@ export function PreviewStep({
                         <div
                           key={field.fieldKey}
                           className={`cs-diff-row ${
-                            field.hasChanged ? 'cs-diff-row-changed' : ''
+                            field.hasChanged ? 'cs-diff-row-changed' : 'cs-diff-row-same'
                           }`}
                         >
-                          <div className="cs-diff-field-name">{field.fieldLabel}</div>
+                          <div className="cs-diff-field-name">
+                            {field.fieldLabel}
+                          </div>
 
-                          <div className="cs-diff-val-before" title={field.currentValue}>
-                            {field.currentValue}
+                          <div className="cs-diff-val-box cs-diff-val-before">
+                            {formatValue(field.currentValue)}
                           </div>
 
                           <div className="cs-diff-arrow">
-                            {field.hasChanged ? '➔' : '—'}
+                            {field.hasChanged ? <ArrowRightIcon /> : '—'}
                           </div>
 
-                          <div>
+                          <div className="cs-diff-val-box cs-diff-val-after">
                             {field.hasChanged ? (
-                              <div className="cs-diff-val-after" title={field.newValue}>
-                                {field.newValue}
-                              </div>
+                              formatValue(field.newValue)
                             ) : (
-                              <div className="cs-diff-val-same">
-                                {field.currentValue} (no change)
-                              </div>
+                              <span className="cs-diff-val-same">
+                                {formatValue(field.currentValue)}{' '}
+                                <small>(unchanged)</small>
+                              </span>
                             )}
                           </div>
                         </div>
@@ -458,19 +477,22 @@ export function PreviewStep({
       </div>
 
       {/* Footer Navigation */}
-      <div className="cs-row" style={{ marginTop: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="cs-preview-footer">
         <button type="button" className="cs-btn" onClick={onBack}>
-          &larr; Back to Validation
+          ← Back to Validation
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ fontSize: 12.5, color: 'var(--cs-text-secondary)' }}>
+        <div className="cs-preview-footer-right">
+          <span className="cs-preview-summary-text">
             {selectedDiffs.length > 0 ? (
               <>
-                <strong>{selectedDiffs.length} card{selectedDiffs.length === 1 ? '' : 's'}</strong> selected ({totalFieldChanges} field updates)
+                <strong>
+                  {selectedDiffs.length} card{selectedDiffs.length === 1 ? '' : 's'}
+                </strong>{' '}
+                selected · <strong>{totalFieldChanges}</strong> field update{totalFieldChanges === 1 ? '' : 's'}
               </>
             ) : (
-              <span style={{ color: 'var(--cs-warning)', fontWeight: 600 }}>
+              <span className="cs-preview-warning-text">
                 No cards selected to update
               </span>
             )}
@@ -482,7 +504,7 @@ export function PreviewStep({
             disabled={selectedDiffs.length === 0}
             onClick={() => onContinue(selectedDiffs)}
           >
-            Continue to Step 5: Execution &rarr;
+            Continue to Step 5: Execution →
           </button>
         </div>
       </div>
