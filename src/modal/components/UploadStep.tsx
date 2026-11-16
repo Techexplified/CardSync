@@ -1,5 +1,12 @@
 import { useMemo, useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import {
+  KeyRound,
+  LayoutList,
+  SlidersHorizontal,
+  CalendarDays,
+  ShieldAlert,
+} from 'lucide-react';
+import {
   exportBoardTemplateCsv,
   exportStarterTemplateCsv,
   parseCsvFile,
@@ -616,9 +623,14 @@ export function UploadStep({
 
         <div className="cs-guide-grid">
           <div className="cs-guide-card">
-            <div className="cs-guide-header">
-              <span>🔑</span>
-              <span>Card Identifier (Required)</span>
+            <div className="cs-guide-card-top">
+              <div className="cs-guide-icon-wrap cs-guide-icon-blue">
+                <KeyRound size={17} strokeWidth={2.2} />
+              </div>
+              <div className="cs-guide-header-text">
+                <span className="cs-guide-card-title">Card Identifier</span>
+                <span className="cs-guide-badge cs-guide-badge-required">Required</span>
+              </div>
             </div>
             <p className="cs-guide-text">
               Every row must have a <code>Card ID</code> (24-character Trello ID, card URL, or title) to locate and update the card in-place with zero duplicates.
@@ -626,9 +638,14 @@ export function UploadStep({
           </div>
 
           <div className="cs-guide-card">
-            <div className="cs-guide-header">
-              <span>📋</span>
-              <span>List Name (To Move Cards)</span>
+            <div className="cs-guide-card-top">
+              <div className="cs-guide-icon-wrap cs-guide-icon-purple">
+                <LayoutList size={17} strokeWidth={2.2} />
+              </div>
+              <div className="cs-guide-header-text">
+                <span className="cs-guide-card-title">List Name</span>
+                <span className="cs-guide-badge cs-guide-badge-action">Move Cards</span>
+              </div>
             </div>
             <p className="cs-guide-text">
               Use <code>List Name</code> to move cards to another list. The name must match an existing list on this board (e.g. {snapshot?.lists.slice(0, 2).map((l) => `"${l.name}"`).join(' or ') || '"To Do"'}).
@@ -636,19 +653,29 @@ export function UploadStep({
           </div>
 
           <div className="cs-guide-card">
-            <div className="cs-guide-header">
-              <span>✏️</span>
-              <span>Selective Column Updates</span>
+            <div className="cs-guide-card-top">
+              <div className="cs-guide-icon-wrap cs-guide-icon-green">
+                <SlidersHorizontal size={17} strokeWidth={2.2} />
+              </div>
+              <div className="cs-guide-header-text">
+                <span className="cs-guide-card-title">Selective Columns</span>
+                <span className="cs-guide-badge cs-guide-badge-info">Flexible</span>
+              </div>
             </div>
             <p className="cs-guide-text">
-              Only include columns you wish to modify (<code>Card Name</code>, <code>Description</code>, <code>Due Date</code>, <code>Labels</code>, <code>Members</code>). Omitted or ignored columns are untouched.
+              Only include columns you wish to modify (<code>Card Name</code>, <code>Description</code>, <code>Due Date</code>, <code>Labels</code>, <code>Members</code>). Omitted or ignored columns are completely untouched.
             </p>
           </div>
 
           <div className="cs-guide-card">
-            <div className="cs-guide-header">
-              <span>📅</span>
-              <span>Dates & Multi-Value Formatting</span>
+            <div className="cs-guide-card-top">
+              <div className="cs-guide-icon-wrap cs-guide-icon-amber">
+                <CalendarDays size={17} strokeWidth={2.2} />
+              </div>
+              <div className="cs-guide-header-text">
+                <span className="cs-guide-card-title">Dates & Formatting</span>
+                <span className="cs-guide-badge cs-guide-badge-info">Syntax</span>
+              </div>
             </div>
             <p className="cs-guide-text">
               Format <code>Due Date</code> as <code>YYYY-MM-DD</code>. Separate multiple labels or members with commas (e.g. <code>Urgent, Bug</code> or <code>@alice, @bob</code>).
@@ -657,9 +684,11 @@ export function UploadStep({
         </div>
 
         <div className="cs-disclaimer-box" role="note">
-          <div className="cs-disclaimer-icon">🛡️</div>
+          <div className="cs-disclaimer-icon-wrap">
+            <ShieldAlert size={20} strokeWidth={2.2} />
+          </div>
           <div className="cs-disclaimer-content">
-            <div className="cs-disclaimer-title">Important Disclaimer</div>
+            <div className="cs-disclaimer-title">IMPORTANT DISCLAIMER · SAFE IN-PLACE UPDATES</div>
             <p className="cs-disclaimer-text">
               <strong>In-Place Updates Only:</strong> CardSync modifies existing cards on this board. It will <strong>never create new cards</strong> or delete unlisted cards. Missing or invalid Card IDs will be flagged and safely skipped. You will review a complete side-by-side diff in Step 4 before changes are applied.
             </p>
