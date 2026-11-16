@@ -357,34 +357,35 @@ body {
 .cs-topbar-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-/* Unified Account Badge */
-.cs-account-badge {
+/* User Profile Chip */
+.cs-user-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #f7f8f9;
+  height: 32px;
+  padding: 0 10px 0 4px;
+  background: var(--cs-surface);
   border: 1px solid var(--cs-border);
   border-radius: 999px;
-  padding: 3px 4px 3px 6px;
+  box-shadow: 0 1px 2px rgba(9, 30, 66, 0.05);
   transition: all 0.15s ease;
 }
 
-.cs-account-badge:hover {
-  background: #ffffff;
+.cs-user-pill:hover {
   border-color: var(--cs-border-strong);
 }
 
-.cs-account-avatar {
+.cs-user-avatar {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0c66e4, #0055cc);
+  background: linear-gradient(135deg, #0c66e4 0%, #0055cc 100%);
   color: #ffffff;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -393,60 +394,67 @@ body {
   text-transform: uppercase;
 }
 
-.cs-account-name {
+.cs-user-name {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--cs-text);
-  padding-right: 2px;
-}
-
-.cs-account-disconnect-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  border: none;
-  color: var(--cs-text-muted);
-  font-size: 11.5px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
   line-height: 1;
 }
 
-.cs-account-disconnect-btn:hover {
-  background: #ffeceb;
-  color: #ae2e24;
+.cs-user-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cs-success);
+  flex-shrink: 0;
 }
 
-/* Vertical divider between account and close */
-.cs-topbar-divider {
-  width: 1px;
-  height: 22px;
-  background: var(--cs-border);
-}
-
-/* Sleek Close Button */
-.cs-topbar-close-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--cs-text-secondary);
+/* Disconnect Button */
+.cs-btn-disconnect {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: 6px;
+  color: var(--cs-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
+  box-shadow: 0 1px 2px rgba(9, 30, 66, 0.05);
   transition: all 0.15s ease;
 }
 
+.cs-btn-disconnect:hover {
+  background: #ffeceb;
+  border-color: #ffd5d2;
+  color: #ae2e24;
+}
+
+/* Close Icon Button */
+.cs-topbar-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: 6px;
+  color: var(--cs-text-secondary);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(9, 30, 66, 0.05);
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
 .cs-topbar-close-btn:hover {
-  background: #091e420f;
+  background: var(--cs-surface-subtle);
+  border-color: var(--cs-border-strong);
   color: var(--cs-text);
-  border-color: var(--cs-border);
 }
 
 /* Stepper */

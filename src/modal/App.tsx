@@ -333,23 +333,23 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
             </div>
 
             <div className="cs-topbar-actions">
-              <div className="cs-account-badge">
-                <div className="cs-account-avatar">
+              <div className="cs-user-pill" title={`Signed in as @${auth.member.username}`}>
+                <span className="cs-user-avatar">
                   {(auth.member.fullName || auth.member.username || 'U')[0].toUpperCase()}
-                </div>
-                <span className="cs-account-name">@{auth.member.username}</span>
-                <button
-                  type="button"
-                  className="cs-account-disconnect-btn"
-                  onClick={() => void handleDisconnect()}
-                  title="Disconnect Trello account"
-                >
-                  <DisconnectIcon />
-                  <span>Disconnect</span>
-                </button>
+                </span>
+                <span className="cs-user-name">@{auth.member.username}</span>
+                <span className="cs-user-dot" title="Connected to Trello" />
               </div>
 
-              <div className="cs-topbar-divider" />
+              <button
+                type="button"
+                className="cs-btn-disconnect"
+                onClick={() => void handleDisconnect()}
+                title="Disconnect Trello account"
+              >
+                <DisconnectIcon />
+                <span>Disconnect</span>
+              </button>
 
               <button
                 type="button"
