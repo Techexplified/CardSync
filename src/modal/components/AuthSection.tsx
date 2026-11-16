@@ -8,11 +8,47 @@ interface AuthSectionProps {
   onClose?: () => void;
 }
 
-function TrelloIcon() {
+function CardSyncIcon() {
   return (
     <svg
-      width="20"
-      height="20"
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+      <path d="M3 3v5h5" />
+      <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+      <path d="M16 16h5v5" />
+    </svg>
+  );
+}
+
+function TrelloTileIcon() {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect x="3.5" y="3.5" width="7" height="13" rx="1.8" fill="#ffffff" />
+      <rect x="13.5" y="3.5" width="7" height="8.5" rx="1.8" fill="#ffffff" />
+    </svg>
+  );
+}
+
+function TrelloBtnIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
@@ -24,7 +60,7 @@ function TrelloIcon() {
   );
 }
 
-function ShieldIcon() {
+function LinkBridgeIcon() {
   return (
     <svg
       width="20"
@@ -37,44 +73,8 @@ function ShieldIcon() {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
-
-function ZapIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
     </svg>
   );
 }
@@ -100,6 +100,19 @@ export function AuthSection({
         </button>
       )}
 
+      {/* Visual App Logo Bridge */}
+      <div className="cs-auth-logos">
+        <div className="cs-auth-logo-tile cs-auth-logo-tile-cardsync" title="CardSync">
+          <CardSyncIcon />
+        </div>
+        <div className="cs-auth-logo-bridge">
+          <LinkBridgeIcon />
+        </div>
+        <div className="cs-auth-logo-tile cs-auth-logo-tile-trello" title="Trello">
+          <TrelloTileIcon />
+        </div>
+      </div>
+
       {/* Top Pill Badge */}
       <div className="cs-auth-badge">
         <span className="cs-auth-badge-dot" />
@@ -110,8 +123,8 @@ export function AuthSection({
       <div className="cs-auth-header">
         <h1 className="cs-auth-title">Connect CardSync to Trello</h1>
         <p className="cs-auth-desc">
-          Safely match and update existing cards in place from your CSV
-          spreadsheets without creating duplicates or altering unmapped fields.
+          Authorize CardSync to match and update existing cards in place from
+          your CSV spreadsheets without creating duplicate cards.
         </p>
       </div>
 
@@ -119,48 +132,12 @@ export function AuthSection({
       {error && (
         <div
           className="cs-alert cs-alert-error"
-          style={{ width: '100%', maxWidth: 680, textAlign: 'left' }}
+          style={{ width: '100%', maxWidth: 540, textAlign: 'left' }}
           role="alert"
         >
           {error}
         </div>
       )}
-
-      {/* 3 Blue-and-White Feature Highlight Cards */}
-      <div className="cs-auth-features">
-        <div className="cs-auth-feature-card">
-          <div className="cs-auth-icon-wrap">
-            <ShieldIcon />
-          </div>
-          <div className="cs-auth-feature-title">100% Client-Side &amp; Private</div>
-          <p className="cs-auth-feature-desc">
-            All CSV parsing, validation, and diff computing run locally inside
-            your browser. Zero external servers store your cards or tokens.
-          </p>
-        </div>
-
-        <div className="cs-auth-feature-card">
-          <div className="cs-auth-icon-wrap">
-            <ZapIcon />
-          </div>
-          <div className="cs-auth-feature-title">In-Place Updates (Zero Duplicates)</div>
-          <p className="cs-auth-feature-desc">
-            Matches cards by ID, URL, short ID, or Title and modifies fields
-            directly via official Trello REST APIs with automatic rate limiting.
-          </p>
-        </div>
-
-        <div className="cs-auth-feature-card">
-          <div className="cs-auth-icon-wrap">
-            <LockIcon />
-          </div>
-          <div className="cs-auth-feature-title">Official Atlassian OAuth</div>
-          <p className="cs-auth-feature-desc">
-            Uses standard read/write scopes. Tokens are stored securely in your
-            private member storage and can be revoked at any time.
-          </p>
-        </div>
-      </div>
 
       {/* Primary Call to Action */}
       <div className="cs-auth-cta-wrap">
@@ -171,7 +148,7 @@ export function AuthSection({
           className="cs-auth-btn-connect"
           onClick={onAuthorizeStart}
         >
-          <TrelloIcon />
+          <TrelloBtnIcon />
           <span>Connect to Trello ↗</span>
         </a>
 
@@ -190,4 +167,3 @@ export function AuthSection({
     </section>
   );
 }
-
