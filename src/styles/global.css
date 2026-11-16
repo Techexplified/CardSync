@@ -309,13 +309,21 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #e9f2ff 0%, #d8e9ff 100%);
-  border: 1px solid #cce0ff;
-  color: var(--cs-primary);
+  background: #ffffff;
+  border: 1px solid #dcdfe4;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(9, 30, 66, 0.06);
+}
+
+.cs-brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .cs-brand-title {
