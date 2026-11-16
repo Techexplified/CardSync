@@ -452,17 +452,6 @@ export function ExecutionReportStep({
                 </button>
               )}
             </div>
-
-            {report && (
-              <button
-                type="button"
-                className="cs-btn cs-btn-subtle cs-btn-sm"
-                onClick={handleDownloadReport}
-              >
-                <DownloadIcon />
-                Download Report (.csv)
-              </button>
-            )}
           </div>
 
           <div className="cs-results-table-wrap">
