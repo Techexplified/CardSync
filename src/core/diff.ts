@@ -282,7 +282,10 @@ export function computeCardDiffs(
         } else {
           const rawItems = rawCsvVal.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
           const resolvedNewIds = rawItems
-            .map((username) => memberByUsername.get(username) ?? memberByFullName.get(username))
+            .map((username) => {
+              const clean = username.replace(/^@/, '');
+              return memberByUsername.get(clean) ?? memberByFullName.get(clean);
+            })
             .filter((id): id is string => Boolean(id));
 
           const targetMemberIds =

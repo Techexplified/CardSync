@@ -251,7 +251,7 @@ function validateRow(
       if (rawValue.trim()) {
         const memberNames = rawValue.split(',').map((m) => m.trim()).filter(Boolean);
         for (const name of memberNames) {
-          const lc = name.toLowerCase();
+          const lc = name.toLowerCase().replace(/^@/, '');
           if (
             !indexes.memberByUsername.has(lc) &&
             !indexes.memberByFullName.has(lc)

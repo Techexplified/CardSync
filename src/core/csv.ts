@@ -101,9 +101,8 @@ export function exportBoardTemplateCsv(snapshot: BoardSnapshot): void {
 
   const rows = snapshot.cards.map((card) => ({
     'Card ID': card.id,
-    'Card #': card.idShort ?? '',
-    List: card.idList ? (listById.get(card.idList) ?? '') : '',
-    Name: card.name,
+    'Card Name': card.name,
+    'List Name': card.idList ? (listById.get(card.idList) ?? '') : '',
     Description: card.desc ?? '',
     'Due Date': card.due ? card.due.slice(0, 10) : '',
     Labels: (card.idLabels ?? [])
@@ -122,9 +121,8 @@ export function exportBoardTemplateCsv(snapshot: BoardSnapshot): void {
       : [
           {
             'Card ID': '',
-            'Card #': '',
-            List: '',
-            Name: '',
+            'Card Name': '',
+            'List Name': '',
             Description: '',
             'Due Date': '',
             Labels: '',
@@ -132,7 +130,39 @@ export function exportBoardTemplateCsv(snapshot: BoardSnapshot): void {
           },
         ];
 
-  const fileName = `${slugifyBoardName(snapshot.board.name)}-cardsync-template.csv`;
+  const fileName = `${slugifyBoardName(snapshot.board.name)}-board-template.csv`;
   exportCsvFile(fileName, safeRows);
+}
+
+export function exportStarterTemplateCsv(snapshot?: BoardSnapshot | null): void {
+  const firstList = snapshot?.lists?.[0]?.name || 'To Do';
+  const secondList = snapshot?.lists?.[1]?.name || 'In Progress';
+  const sampleLabel = snapshot?.labels?.[0]?.name || 'Urgent';
+  const sampleMember = snapshot?.members?.[0]?.username || 'username';
+
+  const rows = [
+    {
+      'Card ID': snapshot?.cards?.[0]?.id || '65a1b2c3d4e5f60718293a4b',
+      'Card Name': snapshot?.cards?.[0]?.name || 'Example Card Title',
+      'List Name': firstList,
+      Description: 'Updated task description or notes...',
+      'Due Date': '2026-12-31',
+      Labels: sampleLabel,
+      Members: sampleMember,
+    },
+    {
+      'Card ID': snapshot?.cards?.[1]?.id || '65a1b2c3d4e5f60718293a4c',
+      'Card Name': snapshot?.cards?.[1]?.name || 'Another Task to Move',
+      'List Name': secondList,
+      Description: 'Move this card to another list by editing List Name',
+      'Due Date': '2026-11-20',
+      Labels: '',
+      Members: '',
+    },
+  ];
+
+  const boardSlug = snapshot?.board?.name ? slugifyBoardName(snapshot.board.name) : 'trello';
+  const fileName = `${boardSlug}-starter-template.csv`;
+  exportCsvFile(fileName, rows);
 }
 

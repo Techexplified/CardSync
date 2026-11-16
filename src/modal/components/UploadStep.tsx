@@ -1,5 +1,9 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
-import { exportBoardTemplateCsv, parseCsvFile } from '../../core/csv';
+import {
+  exportBoardTemplateCsv,
+  exportStarterTemplateCsv,
+  parseCsvFile,
+} from '../../core/csv';
 import type { ParsedCsvData } from '../../types/cardsync';
 import type { BoardSnapshot } from '../../types/trello';
 import '../../styles/upload.css';
@@ -100,31 +104,23 @@ export function UploadStep({
 
   return (
     <div className="cs-stack-lg">
+      {/* 1. Board Snapshot & Template Generator */}
       <section className="cs-card">
         <div className="cs-row">
           <div style={{ flex: '1 1 320px' }}>
             <h2 className="cs-card-title">Board Snapshot</h2>
             <p className="cs-card-desc">
-              Download your board&apos;s cards as a template with real Card IDs, or
-              refresh before importing your updated spreadsheet.
+              Live overview of cards and lists on this board. Download a pre-filled CSV template to edit cards directly.
             </p>
           </div>
           <div className="cs-actions">
             <button
               type="button"
-              className="cs-btn"
+              className="cs-btn cs-btn-subtle"
               disabled={snapshotLoading}
               onClick={() => void onRefreshBoard()}
             >
-              {snapshotLoading ? 'Refreshing...' : 'Refresh Board'}
-            </button>
-            <button
-              type="button"
-              className="cs-btn"
-              disabled={!snapshot || snapshotLoading}
-              onClick={() => snapshot && exportBoardTemplateCsv(snapshot)}
-            >
-              Download Board CSV Template
+              {snapshotLoading ? 'Refreshing...' : '↻ Refresh Board'}
             </button>
           </div>
         </div>
@@ -140,24 +136,70 @@ export function UploadStep({
         )}
 
         {snapshot ? (
-          <div className="cs-stats-grid">
-            <div className="cs-stat-tile">
-              <div className="cs-label">Open Cards</div>
-              <div className="cs-stat-value">{snapshot.cards.length}</div>
+          <>
+            <div className="cs-stats-grid">
+              <div className="cs-stat-tile">
+                <div className="cs-label">Open Cards</div>
+                <div className="cs-stat-value">{snapshot.cards.length}</div>
+              </div>
+              <div className="cs-stat-tile">
+                <div className="cs-label">Lists</div>
+                <div className="cs-stat-value">{snapshot.lists.length}</div>
+              </div>
+              <div className="cs-stat-tile">
+                <div className="cs-label">Labels</div>
+                <div className="cs-stat-value">{snapshot.labels.length}</div>
+              </div>
+              <div className="cs-stat-tile">
+                <div className="cs-label">Members</div>
+                <div className="cs-stat-value">{snapshot.members.length}</div>
+              </div>
             </div>
-            <div className="cs-stat-tile">
-              <div className="cs-label">Lists</div>
-              <div className="cs-stat-value">{snapshot.lists.length}</div>
+
+            {/* Template Box with Card ID and List Name */}
+            <div className="cs-template-box">
+              <div className="cs-template-box-content">
+                <div className="cs-template-box-title">
+                  <span>📥</span>
+                  <span>Pre-Formatted CSV Templates</span>
+                </div>
+                <p className="cs-template-box-desc">
+                  Includes exact <strong>Card ID</strong> and <strong>List Name</strong> columns for this board. Edit values directly in Excel or Google Sheets, then drop it below to update cards in-place.
+                </p>
+              </div>
+              <div className="cs-template-actions">
+                <button
+                  type="button"
+                  className="cs-btn cs-btn-sm"
+                  disabled={snapshotLoading}
+                  onClick={() => exportBoardTemplateCsv(snapshot)}
+                  title="Download CSV containing all current cards on this board with real Card IDs and List Names"
+                >
+                  Download Board CSV ({snapshot.cards.length} cards)
+                </button>
+                <button
+                  type="button"
+                  className="cs-btn cs-btn-subtle cs-btn-sm"
+                  onClick={() => exportStarterTemplateCsv(snapshot)}
+                  title="Download a clean starter CSV file with sample rows"
+                >
+                  Sample Blank Template
+                </button>
+              </div>
             </div>
-            <div className="cs-stat-tile">
-              <div className="cs-label">Labels</div>
-              <div className="cs-stat-value">{snapshot.labels.length}</div>
-            </div>
-            <div className="cs-stat-tile">
-              <div className="cs-label">Members</div>
-              <div className="cs-stat-value">{snapshot.members.length}</div>
-            </div>
-          </div>
+
+            {/* Available Lists Bar */}
+            {snapshot.lists.length > 0 && (
+              <div className="cs-board-lists-bar">
+                <span className="cs-board-lists-title">Available Lists:</span>
+                {snapshot.lists.map((l) => (
+                  <span key={l.id} className="cs-list-chip" title={`List ID: ${l.id}`}>
+                    📋 {l.name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           snapshotLoading && (
             <p className="cs-card-desc" style={{ marginTop: 12 }}>
@@ -166,6 +208,70 @@ export function UploadStep({
           )
         )}
       </section>
+
+      {/* 2. CSV Import Requirements & Disclaimer */}
+      <section className="cs-card cs-stack-md">
+        <div>
+          <h2 className="cs-card-title">CSV Import Requirements & Guidelines</h2>
+          <p className="cs-card-desc">
+            Review the supported columns and rules before uploading your spreadsheet.
+          </p>
+        </div>
+
+        <div className="cs-guide-grid">
+          <div className="cs-guide-card">
+            <div className="cs-guide-header">
+              <span>🔑</span>
+              <span>Card Identifier (Required)</span>
+            </div>
+            <p className="cs-guide-text">
+              Every row must have a <code>Card ID</code> (24-character Trello ID, card URL, or title) to locate and update the card in-place with zero duplicates.
+            </p>
+          </div>
+
+          <div className="cs-guide-card">
+            <div className="cs-guide-header">
+              <span>📋</span>
+              <span>List Name (To Move Cards)</span>
+            </div>
+            <p className="cs-guide-text">
+              Use <code>List Name</code> to move cards to another list. The name must match an existing list on this board (e.g. {snapshot?.lists.slice(0, 2).map((l) => `"${l.name}"`).join(' or ') || '"To Do"'}).
+            </p>
+          </div>
+
+          <div className="cs-guide-card">
+            <div className="cs-guide-header">
+              <span>✏️</span>
+              <span>Selective Column Updates</span>
+            </div>
+            <p className="cs-guide-text">
+              Only include columns you wish to modify (<code>Card Name</code>, <code>Description</code>, <code>Due Date</code>, <code>Labels</code>, <code>Members</code>). Omitted or ignored columns are untouched.
+            </p>
+          </div>
+
+          <div className="cs-guide-card">
+            <div className="cs-guide-header">
+              <span>📅</span>
+              <span>Dates & Multi-Value Formatting</span>
+            </div>
+            <p className="cs-guide-text">
+              Format <code>Due Date</code> as <code>YYYY-MM-DD</code>. Separate multiple labels or members with commas (e.g. <code>Urgent, Bug</code> or <code>@alice, @bob</code>).
+            </p>
+          </div>
+        </div>
+
+        <div className="cs-disclaimer-box" role="note">
+          <div className="cs-disclaimer-icon">🛡️</div>
+          <div className="cs-disclaimer-content">
+            <div className="cs-disclaimer-title">Important Disclaimer</div>
+            <p className="cs-disclaimer-text">
+              <strong>In-Place Updates Only:</strong> CardSync modifies existing cards on this board. It will <strong>never create new cards</strong> or delete unlisted cards. Missing or invalid Card IDs will be flagged and safely skipped. You will review a complete side-by-side diff in Step 4 before changes are applied.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Upload CSV File */}
 
       <section className="cs-card cs-stack-md">
         <div>
