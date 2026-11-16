@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import {
   TRELLO_FIELDS,
-  autoDetectMapping,
   validateMapping,
 } from '../../core/mapping';
 import type {
@@ -72,14 +71,6 @@ export function MappingStep({
     });
   }
 
-  function handleAutoDetectAll() {
-    const detected = autoDetectMapping(csvData.headers);
-    onMappingChange({
-      ...mappingConfig,
-      mappings: detected,
-    });
-  }
-
   function handleSetAllIgnore() {
     const ignored: Record<string, TrelloFieldKey> = {};
     for (const h of csvData.headers) {
@@ -119,14 +110,6 @@ export function MappingStep({
           </p>
         </div>
         <div className="cs-actions">
-          <button
-            type="button"
-            className="cs-btn cs-btn-sm"
-            onClick={handleAutoDetectAll}
-            title="Automatically guess matching Trello fields from header names"
-          >
-            Auto-Detect All
-          </button>
           <button
             type="button"
             className="cs-btn cs-btn-subtle cs-btn-sm"
