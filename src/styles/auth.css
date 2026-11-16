@@ -4,6 +4,7 @@
 
 /* Full-width Auth Hero Card */
 .cs-scope .cs-auth-hero {
+  position: relative;
   width: 100%;
   max-width: 100%;
   background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
@@ -17,6 +18,31 @@
   text-align: center;
   gap: 28px;
   box-sizing: border-box;
+}
+
+/* Subtle corner close button */
+.cs-scope .cs-auth-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: #626f86;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.cs-scope .cs-auth-close-btn:hover {
+  background: #091e420f;
+  color: #172b4d;
 }
 
 /* Top Pill Badge */

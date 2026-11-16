@@ -5,6 +5,7 @@ interface AuthSectionProps {
   authorizing: boolean;
   onAuthorizeStart: () => void;
   error?: string | null;
+  onClose?: () => void;
 }
 
 function TrelloIcon() {
@@ -83,9 +84,22 @@ export function AuthSection({
   authorizing,
   onAuthorizeStart,
   error,
+  onClose,
 }: AuthSectionProps) {
   return (
     <section className="cs-auth-hero" aria-label="Trello Authorization">
+      {onClose && (
+        <button
+          type="button"
+          className="cs-auth-close-btn"
+          onClick={onClose}
+          aria-label="Close"
+          title="Close"
+        >
+          ✕
+        </button>
+      )}
+
       {/* Top Pill Badge */}
       <div className="cs-auth-badge">
         <span className="cs-auth-badge-dot" />

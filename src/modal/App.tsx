@@ -258,54 +258,42 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
   return (
     <main className="cs-scope cs-modal-bg">
       <div className="cs-modal-container">
-        <header className="cs-topbar">
-          <div className="cs-brand">
-            <div className="cs-brand-icon">
-              <SyncLogoIcon />
-            </div>
-            <div>
-              <h1 className="cs-brand-title">CardSync</h1>
-              <div className="cs-brand-sub">
-                Bulk CSV Updater &middot; Board:{' '}
-                <strong>{board?.name ?? 'Loading...'}</strong>
+        {auth?.state === 'authorized' && (
+          <header className="cs-topbar">
+            <div className="cs-brand">
+              <div className="cs-brand-icon">
+                <SyncLogoIcon />
+              </div>
+              <div>
+                <h1 className="cs-brand-title">CardSync</h1>
+                <div className="cs-brand-sub">
+                  Bulk CSV Updater &middot; Board:{' '}
+                  <strong>{board?.name ?? 'Loading...'}</strong>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="cs-actions">
-            {auth?.state === 'authorized' && (
-              <>
-                <span className="cs-pill cs-pill-success">
-                  <span className="cs-dot" />@{auth.member.username}
-                </span>
-                <button
-                  type="button"
-                  className="cs-btn cs-btn-subtle cs-btn-sm"
-                  onClick={() => void handleDisconnect()}
-                >
-                  Disconnect
-                </button>
-              </>
-            )}
-            {auth?.state === 'unauthorized' && (
-              <span className="cs-pill cs-pill-muted">
-                Authorization required
+            <div className="cs-actions">
+              <span className="cs-pill cs-pill-success">
+                <span className="cs-dot" />@{auth.member.username}
               </span>
-            )}
-            {auth?.state === 'missing-key' && (
-              <span className="cs-pill cs-pill-warning">
-                API key not configured
-              </span>
-            )}
-            <button
-              type="button"
-              className="cs-btn cs-btn-sm"
-              onClick={() => void t.closeModal()}
-            >
-              Close
-            </button>
-          </div>
-        </header>
+              <button
+                type="button"
+                className="cs-btn cs-btn-subtle cs-btn-sm"
+                onClick={() => void handleDisconnect()}
+              >
+                Disconnect
+              </button>
+              <button
+                type="button"
+                className="cs-btn cs-btn-sm"
+                onClick={() => void t.closeModal()}
+              >
+                Close
+              </button>
+            </div>
+          </header>
+        )}
 
         {auth?.state === 'authorized' && (
           <nav className="cs-stepper" aria-label="Bulk update steps">
@@ -385,6 +373,7 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
               setError(null);
             }}
             error={error}
+            onClose={() => void t.closeModal()}
           />
         )}
 
