@@ -15,6 +15,7 @@ import { fetchBoardSnapshot } from '../services/trelloBoard';
 import type { CardDiff, ColumnMappingConfig, ParsedCsvData } from '../types/cardsync';
 import type { BoardSnapshot, TrelloBoard, TrelloClient } from '../types/trello';
 import type { ValidatedRow } from '../core/validator';
+import { AuthSection } from './components/AuthSection';
 import { ExecutionReportStep } from './components/ExecutionReportStep';
 import { MappingStep } from './components/MappingStep';
 import { PreviewStep } from './components/PreviewStep';
@@ -71,10 +72,6 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
   const [savedMapping, setSavedMapping] = useState<ColumnMappingConfig | null>(null);
   const [validatedRows, setValidatedRows] = useState<ValidatedRow[] | null>(null);
   const [selectedCardsToSync, setSelectedCardsToSync] = useState<CardDiff[] | null>(null);
-
-  const [manualToken, setManualToken] = useState('');
-  const [showManual, setShowManual] = useState(false);
-  const [savingManual, setSavingManual] = useState(false);
 
   const loadBoardData = useCallback(
     async (boardData: TrelloBoard, token: string) => {
@@ -220,33 +217,6 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
     };
   }, [t, applyToken]);
 
-  async function handleSaveManualToken() {
-    if (!t || savingManual || !manualToken.trim()) return;
-    setSavingManual(true);
-    setError(null);
-    try {
-      const result = await saveManualToken(t, manualToken);
-      setAuth({
-        state: 'authorized',
-        member: result.member,
-        token: result.token,
-      });
-      setManualToken('');
-      setShowManual(false);
-      if (board) {
-        void loadBoardData(board, result.token);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Invalid Trello token. Please verify and try again.'
-      );
-    } finally {
-      setSavingManual(false);
-    }
-  }
-
   async function handleDisconnect() {
     if (!t) return;
     await disconnectTrello(t);
@@ -337,23 +307,25 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
           </div>
         </header>
 
-        <nav className="cs-stepper" aria-label="Bulk update steps">
-          {WIZARD_STEPS.map((label, index) => {
-            const isActive = auth?.state === 'authorized' && index === activeStep;
-            const isDone = auth?.state === 'authorized' && index < activeStep;
-            return (
-              <div
-                key={label}
-                className={`cs-step ${
-                  isActive ? 'cs-step-active' : isDone ? 'cs-step-done' : ''
-                }`}
-              >
-                <span className="cs-step-num">{isDone ? '✓' : index + 1}</span>
-                <span className="cs-step-label">{label}</span>
-              </div>
-            );
-          })}
-        </nav>
+        {auth?.state === 'authorized' && (
+          <nav className="cs-stepper" aria-label="Bulk update steps">
+            {WIZARD_STEPS.map((label, index) => {
+              const isActive = index === activeStep;
+              const isDone = index < activeStep;
+              return (
+                <div
+                  key={label}
+                  className={`cs-step ${
+                    isActive ? 'cs-step-active' : isDone ? 'cs-step-done' : ''
+                  }`}
+                >
+                  <span className="cs-step-num">{isDone ? '✓' : index + 1}</span>
+                  <span className="cs-step-label">{label}</span>
+                </div>
+              );
+            })}
+          </nav>
+        )}
 
         {error && (
           <div className="cs-alert cs-alert-error" role="alert">
@@ -405,75 +377,15 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
         )}
 
         {!loading && auth?.state === 'unauthorized' && (
-          <section className="cs-card cs-auth-card cs-stack-md">
-            <div>
-              <h2 className="cs-card-title">Authorize Trello Access</h2>
-              <p className="cs-card-desc">
-                Grant CardSync read and write permission on your Trello account so it
-                can match existing cards by Card ID and apply validated CSV updates.
-              </p>
-            </div>
-            <div className="cs-subbox">
-              <div className="cs-label">Requested Permissions</div>
-              <div>
-                Scope: <code>read,write</code> &middot; Token lifetime:{' '}
-                <code>30 days</code>
-              </div>
-            </div>
-            <div className="cs-actions">
-              <a
-                href={buildTrelloAuthUrl()}
-                target="_blank"
-                rel="opener"
-                className="cs-btn cs-btn-primary"
-                onClick={() => {
-                  setAuthorizing(true);
-                  setError(null);
-                }}
-              >
-                Connect Trello Account ↗
-              </a>
-              <button
-                type="button"
-                className="cs-btn cs-btn-subtle"
-                onClick={() => setShowManual((prev) => !prev)}
-              >
-                {showManual ? 'Hide Manual Token' : 'Paste Token / URL Manually'}
-              </button>
-            </div>
-
-            {authorizing && (
-              <div className="cs-alert" style={{ background: '#e9f2ff', color: '#0052cc', border: '1px solid #b3d4ff' }}>
-                Opened Trello authorization in a new tab. Click <strong>Allow</strong> on Trello! CardSync will connect automatically once approved.
-              </div>
-            )}
-
-            {showManual && (
-              <div className="cs-subbox cs-stack-sm" style={{ marginTop: 8 }}>
-                <div className="cs-label">Paste Token or Callback URL</div>
-                <p className="cs-card-desc" style={{ marginBottom: 6 }}>
-                  If the tab does not close automatically, copy the token or the full URL from the address bar (e.g. <code>https://...#token=...</code>) and paste it below:
-                </p>
-                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                  <input
-                    type="text"
-                    className="cs-input"
-                    placeholder="Paste token or redirected URL (e.g. https://...#token=...)"
-                    value={manualToken}
-                    onChange={(e) => setManualToken(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="cs-btn cs-btn-primary cs-btn-sm"
-                    disabled={savingManual || !manualToken.trim()}
-                    onClick={() => void handleSaveManualToken()}
-                  >
-                    {savingManual ? 'Saving...' : 'Save Token'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
+          <AuthSection
+            authUrl={buildTrelloAuthUrl()}
+            authorizing={authorizing}
+            onAuthorizeStart={() => {
+              setAuthorizing(true);
+              setError(null);
+            }}
+            error={error}
+          />
         )}
 
         {!loading && auth?.state === 'authorized' && activeStep === 0 && (
