@@ -51,6 +51,61 @@ function SyncLogoIcon() {
   );
 }
 
+function BoardIcon() {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2.5" />
+      <rect x="4" y="4" width="7" height="12" rx="1" fill="currentColor" />
+      <rect x="13" y="4" width="7" height="8" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function DisconnectIcon() {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
 interface ModalAppProps {
   trelloClient: TrelloClient | null;
 }
@@ -267,29 +322,43 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
               <div>
                 <h1 className="cs-brand-title">CardSync</h1>
                 <div className="cs-brand-sub">
-                  Bulk CSV Updater &middot; Board:{' '}
-                  <strong>{board?.name ?? 'Loading...'}</strong>
+                  <span>Bulk CSV Updater</span>
+                  <span>&middot;</span>
+                  <span className="cs-board-pill" title={board?.name ?? 'Board'}>
+                    <BoardIcon />
+                    <span>{board?.name ?? 'Board'}</span>
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="cs-actions">
-              <span className="cs-pill cs-pill-success">
-                <span className="cs-dot" />@{auth.member.username}
-              </span>
+            <div className="cs-topbar-actions">
+              <div className="cs-account-badge">
+                <div className="cs-account-avatar">
+                  {(auth.member.fullName || auth.member.username || 'U')[0].toUpperCase()}
+                </div>
+                <span className="cs-account-name">@{auth.member.username}</span>
+                <button
+                  type="button"
+                  className="cs-account-disconnect-btn"
+                  onClick={() => void handleDisconnect()}
+                  title="Disconnect Trello account"
+                >
+                  <DisconnectIcon />
+                  <span>Disconnect</span>
+                </button>
+              </div>
+
+              <div className="cs-topbar-divider" />
+
               <button
                 type="button"
-                className="cs-btn cs-btn-subtle cs-btn-sm"
-                onClick={() => void handleDisconnect()}
-              >
-                Disconnect
-              </button>
-              <button
-                type="button"
-                className="cs-btn cs-btn-sm"
+                className="cs-topbar-close-btn"
                 onClick={() => void t.closeModal()}
+                title="Close modal"
+                aria-label="Close"
               >
-                Close
+                <CloseIcon />
               </button>
             </div>
           </header>
