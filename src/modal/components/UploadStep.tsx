@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
+import { useMemo, useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import {
   exportBoardTemplateCsv,
   exportStarterTemplateCsv,
@@ -24,6 +24,32 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fallback below
+  }
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    return successful;
+  } catch {
+    return false;
+  }
 }
 
 function UploadIcon() {
@@ -59,6 +85,59 @@ export function UploadStep({
   const [dragging, setDragging] = useState(false);
   const [parsing, setParsing] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
+
+  const [selectedListId, setSelectedListId] = useState<string | null>(null);
+  const [copiedCardId, setCopiedCardId] = useState<string | null>(null);
+  const [copiedListName, setCopiedListName] = useState<boolean>(false);
+  const [cardSearch, setCardSearch] = useState<string>('');
+
+  const cardCountByList = useMemo(() => {
+    const map = new Map<string, number>();
+    if (snapshot) {
+      for (const card of snapshot.cards) {
+        if (card.idList) {
+          map.set(card.idList, (map.get(card.idList) ?? 0) + 1);
+        }
+      }
+    }
+    return map;
+  }, [snapshot]);
+
+  const selectedList = useMemo(() => {
+    return snapshot?.lists.find((l) => l.id === selectedListId) ?? null;
+  }, [snapshot, selectedListId]);
+
+  const cardsInSelectedList = useMemo(() => {
+    if (!snapshot || !selectedListId) return [];
+    return snapshot.cards.filter((c) => c.idList === selectedListId);
+  }, [snapshot, selectedListId]);
+
+  const filteredCards = useMemo(() => {
+    const q = cardSearch.trim().toLowerCase();
+    if (!q) return cardsInSelectedList;
+    return cardsInSelectedList.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q) ||
+        (c.idShort !== undefined && String(c.idShort).includes(q))
+    );
+  }, [cardsInSelectedList, cardSearch]);
+
+  async function handleCopyCardId(cardId: string) {
+    const ok = await copyTextToClipboard(cardId);
+    if (ok) {
+      setCopiedCardId(cardId);
+      setTimeout(() => setCopiedCardId(null), 1800);
+    }
+  }
+
+  async function handleCopyListName(name: string) {
+    const ok = await copyTextToClipboard(name);
+    if (ok) {
+      setCopiedListName(true);
+      setTimeout(() => setCopiedListName(false), 1800);
+    }
+  }
 
   async function processFile(file: File | undefined) {
     if (!file) return;
@@ -188,15 +267,177 @@ export function UploadStep({
               </div>
             </div>
 
-            {/* Available Lists Bar */}
+            {/* Available Lists Bar with Interactive Card Inspector */}
             {snapshot.lists.length > 0 && (
               <div className="cs-board-lists-bar">
-                <span className="cs-board-lists-title">Available Lists:</span>
-                {snapshot.lists.map((l) => (
-                  <span key={l.id} className="cs-list-chip" title={`List ID: ${l.id}`}>
-                    📋 {l.name}
+                <div className="cs-board-lists-header">
+                  <span className="cs-board-lists-title">Available Lists:</span>
+                  <span className="cs-board-lists-hint">
+                    (Click any list to inspect its cards & copy Card IDs)
                   </span>
-                ))}
+                </div>
+
+                <div className="cs-list-chips-wrap">
+                  {snapshot.lists.map((l) => {
+                    const count = cardCountByList.get(l.id) ?? 0;
+                    const isSelected = selectedListId === l.id;
+                    return (
+                      <button
+                        key={l.id}
+                        type="button"
+                        className={`cs-list-chip-btn ${isSelected ? 'cs-list-chip-active' : ''}`}
+                        onClick={() => {
+                          setSelectedListId(isSelected ? null : l.id);
+                          setCardSearch('');
+                        }}
+                        title={`Click to view cards in "${l.name}"`}
+                      >
+                        <span>📋</span>
+                        <span>{l.name}</span>
+                        <span
+                          className={`cs-list-chip-count ${
+                            isSelected ? 'cs-list-chip-count-active' : ''
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Collapsible Card Details Drawer for Selected List */}
+                {selectedList && (
+                  <div className="cs-list-details-panel">
+                    <div className="cs-list-details-header">
+                      <div className="cs-list-details-title">
+                        <span style={{ fontSize: 16 }}>📋</span>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <strong>{selectedList.name}</strong>
+                            <span className="cs-pill cs-pill-info">
+                              {cardsInSelectedList.length} card
+                              {cardsInSelectedList.length === 1 ? '' : 's'}
+                            </span>
+                          </div>
+                          <div className="cs-card-desc" style={{ fontSize: 11, marginTop: 2 }}>
+                            Copy any Card ID below into your CSV to update or move cards in-place
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="cs-actions">
+                        {cardsInSelectedList.length > 3 && (
+                          <input
+                            type="text"
+                            className="cs-input cs-input-sm"
+                            placeholder="Search cards..."
+                            value={cardSearch}
+                            onChange={(e) => setCardSearch(e.target.value)}
+                            style={{ width: 140, height: 28, fontSize: 11.5 }}
+                          />
+                        )}
+                        <button
+                          type="button"
+                          className="cs-btn cs-btn-subtle cs-btn-sm"
+                          onClick={() => void handleCopyListName(selectedList.name)}
+                          title="Copy list name to clipboard for List Name column"
+                          style={{ height: 28, fontSize: 11.5 }}
+                        >
+                          {copiedListName ? '✓ List Name Copied' : '📋 Copy List Name'}
+                        </button>
+                        <button
+                          type="button"
+                          className="cs-list-close-btn"
+                          onClick={() => setSelectedListId(null)}
+                          title="Close card inspector"
+                          aria-label="Close"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    {cardsInSelectedList.length === 0 ? (
+                      <div className="cs-list-empty">
+                        No open cards in list &quot;{selectedList.name}&quot;.
+                      </div>
+                    ) : filteredCards.length === 0 ? (
+                      <div className="cs-list-empty">
+                        No cards match &quot;{cardSearch}&quot;.
+                      </div>
+                    ) : (
+                      <div className="cs-table-wrap" style={{ maxHeight: 250 }}>
+                        <table className="cs-table">
+                          <thead>
+                            <tr>
+                              <th style={{ width: '42%' }}>Card Title</th>
+                              <th style={{ width: '38%' }}>Card ID (For CSV Matching)</th>
+                              <th style={{ width: '20%', textAlign: 'right' }}>Copy ID</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredCards.map((card) => {
+                              const isCopied = copiedCardId === card.id;
+                              return (
+                                <tr key={card.id}>
+                                  <td>
+                                    <div
+                                      style={{
+                                        fontWeight: 600,
+                                        color: 'var(--cs-text)',
+                                        lineHeight: 1.3,
+                                      }}
+                                    >
+                                      {card.name}
+                                    </div>
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        gap: 6,
+                                        alignItems: 'center',
+                                        marginTop: 3,
+                                      }}
+                                    >
+                                      {card.idShort && (
+                                        <span className="cs-card-desc" style={{ fontSize: 11 }}>
+                                          #{card.idShort}
+                                        </span>
+                                      )}
+                                      {card.due && (
+                                        <span className="cs-due-chip">
+                                          Due: {card.due.slice(0, 10)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <code className="cs-card-id-code" title={card.id}>
+                                      {card.id}
+                                    </code>
+                                  </td>
+                                  <td style={{ textAlign: 'right' }}>
+                                    <button
+                                      type="button"
+                                      className={`cs-btn cs-btn-sm ${
+                                        isCopied ? 'cs-btn-success' : 'cs-btn-subtle'
+                                      }`}
+                                      onClick={() => void handleCopyCardId(card.id)}
+                                      title="Copy this Card ID to clipboard"
+                                      style={{ height: 26, padding: '0 10px', fontSize: 11 }}
+                                    >
+                                      {isCopied ? '✓ Copied' : 'Copy ID'}
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </>
