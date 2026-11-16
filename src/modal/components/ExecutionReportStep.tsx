@@ -14,6 +14,7 @@ import '../../styles/execution.css';
 interface ExecutionReportStepProps {
   selectedCards: CardDiff[];
   token: string;
+  boardId?: string;
   boardName?: string;
   onBack: () => void;
   onReset: () => void;
@@ -88,6 +89,7 @@ function RefreshIcon() {
 export function ExecutionReportStep({
   selectedCards,
   token,
+  boardId,
   boardName = 'Trello Board',
   onBack,
   onReset,
@@ -145,6 +147,7 @@ export function ExecutionReportStep({
 
     try {
       const execReport = await runBatchExecution(selectedCards, {
+        boardId,
         token,
         concurrency: 3,
         signal: controller.signal,

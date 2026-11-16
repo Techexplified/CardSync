@@ -205,20 +205,44 @@ export function computeCardDiffs(
             hasChanged: false,
           });
         } else {
-          const rawItems = rawCsvVal.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-          const resolvedNewIds = rawItems
-            .map((name) => labelByName.get(name))
-            .filter((id): id is string => Boolean(id));
+          // Parse raw items preserving original casing for newly created labels
+          const rawItems = rawCsvVal
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
 
-          const targetLabelIds =
-            mappingConfig.labelsMode === 'append'
-              ? Array.from(new Set([...currentLabelIds, ...resolvedNewIds]))
-              : resolvedNewIds;
+          let targetNames: string[] = [];
+          if (mappingConfig.labelsMode === 'append') {
+            const existingNames = currentLabelIds.map(
+              (id) => labelById.get(id) ?? id
+            );
+            const seenLower = new Set(existingNames.map((n) => n.toLowerCase()));
+            targetNames = [...existingNames];
+            for (const item of rawItems) {
+              if (!seenLower.has(item.toLowerCase())) {
+                seenLower.add(item.toLowerCase());
+                targetNames.push(item);
+              }
+            }
+          } else {
+            const seenLower = new Set<string>();
+            for (const item of rawItems) {
+              if (!seenLower.has(item.toLowerCase())) {
+                seenLower.add(item.toLowerCase());
+                targetNames.push(item);
+              }
+            }
+          }
 
-          const hasChanged = !arraysEqual(currentLabelIds, targetLabelIds);
-          const newLabelsDisplay =
-            targetLabelIds.map((id) => labelById.get(id) ?? id).join(', ') ||
-            '(none)';
+          const currentNamesSorted = currentLabelIds
+            .map((id) => (labelById.get(id) ?? id).toLowerCase())
+            .sort();
+          const targetNamesSorted = targetNames
+            .map((n) => n.toLowerCase())
+            .sort();
+
+          const hasChanged = !arraysEqual(currentNamesSorted, targetNamesSorted);
+          const newLabelsDisplay = targetNames.join(', ') || '(none)';
 
           fieldDiffs.push({
             fieldKey: 'labels',
@@ -227,8 +251,14 @@ export function computeCardDiffs(
             newValue: newLabelsDisplay,
             hasChanged,
           });
+
           if (hasChanged) {
-            updatePayload.idLabels = targetLabelIds;
+            const resolvedNewIds = targetNames
+              .map((name) => labelByName.get(name.toLowerCase()))
+              .filter((id): id is string => Boolean(id));
+
+            updatePayload.idLabels = resolvedNewIds;
+            updatePayload.labelNames = targetNames;
           }
         }
       }

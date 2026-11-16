@@ -556,6 +556,7 @@ export function ModalApp({ trelloClient }: ModalAppProps) {
             <ExecutionReportStep
               selectedCards={selectedCardsToSync}
               token={auth.token}
+              boardId={board?.id}
               boardName={board?.name}
               onBack={() => setActiveStep(3)}
               onReset={handleResetWizard}

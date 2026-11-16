@@ -74,6 +74,7 @@ export interface CardDiff {
     idList?: string;
     idLabels?: string[];
     idMembers?: string[];
+    labelNames?: string[];
   };
 }
 

@@ -239,7 +239,7 @@ function validateRow(
           if (!indexes.labelByName.has(name.toLowerCase())) {
             issues.push({
               field: cleanField,
-              message: `Label "${name}" will be added as new or skipped.`,
+              message: `Label "${name}" will be automatically created on this board.`,
               severity: 'warning',
             });
           }

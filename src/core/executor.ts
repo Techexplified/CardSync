@@ -34,6 +34,53 @@ function getFieldFriendlyName(fieldKey: string): string {
   }
 }
 
+const TRELLO_LABEL_COLORS = [
+  'blue',
+  'green',
+  'orange',
+  'purple',
+  'red',
+  'yellow',
+  'sky',
+  'lime',
+  'pink',
+];
+
+/**
+ * Creates a missing label on a Trello board via REST API
+ */
+export async function createBoardLabel(
+  boardId: string,
+  name: string,
+  token: string,
+  colorIndex = 0,
+  signal?: AbortSignal
+): Promise<{ id: string; name: string; color: string | null }> {
+  const color = TRELLO_LABEL_COLORS[colorIndex % TRELLO_LABEL_COLORS.length];
+  const url = `https://api.trello.com/1/boards/${encodeURIComponent(
+    boardId
+  )}/labels?key=${TRELLO_APP_KEY}&token=${token}&name=${encodeURIComponent(
+    name
+  )}&color=${encodeURIComponent(color)}`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+    },
+    signal,
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(
+      `Failed to create label "${name}": ${errText || res.statusText}`
+    );
+  }
+
+  return (await res.json()) as { id: string; name: string; color: string | null };
+}
+
 /**
  * Execute a single card update with retry and exponential backoff on HTTP 429
  */
@@ -183,6 +230,7 @@ export async function updateSingleCard(
 }
 
 export interface ExecutionOptions {
+  boardId?: string;
   token: string;
   concurrency?: number;
   signal?: AbortSignal;
@@ -206,6 +254,7 @@ export async function runBatchExecution(
   options: ExecutionOptions
 ): Promise<ExecutionReport> {
   const {
+    boardId,
     token,
     concurrency = DEFAULT_CONCURRENCY,
     signal,
@@ -238,6 +287,95 @@ export async function runBatchExecution(
         message,
         cardName,
       });
+    }
+  }
+
+  // Pre-process and auto-create any missing labels on the board
+  if (boardId) {
+    const labelMap = new Map<string, string>(); // lowercase name -> label ID
+
+    try {
+      const labelsRes = await fetch(
+        `https://api.trello.com/1/boards/${encodeURIComponent(
+          boardId
+        )}/labels?key=${TRELLO_APP_KEY}&token=${token}&limit=1000`,
+        { signal }
+      );
+      if (labelsRes.ok) {
+        const boardLabels = (await labelsRes.json()) as {
+          id: string;
+          name: string;
+        }[];
+        for (const l of boardLabels) {
+          if (l.name) {
+            labelMap.set(l.name.toLowerCase().trim(), l.id);
+          }
+        }
+      }
+    } catch {
+      // Proceed with best effort if label fetching fails
+    }
+
+    // Collect all label names across cards that need to be created
+    const missingLabelNames = new Set<string>();
+    for (const card of cards) {
+      if (card.updatePayload.labelNames) {
+        for (const rawName of card.updatePayload.labelNames) {
+          const lc = rawName.toLowerCase().trim();
+          if (lc && !labelMap.has(lc)) {
+            missingLabelNames.add(rawName.trim());
+          }
+        }
+      }
+    }
+
+    if (missingLabelNames.size > 0) {
+      pushLog(
+        'info',
+        `Auto-creating ${missingLabelNames.size} missing label${
+          missingLabelNames.size === 1 ? '' : 's'
+        } on Trello board...`
+      );
+
+      let colorIdx = 0;
+      for (const name of Array.from(missingLabelNames)) {
+        if (signal?.aborted) break;
+        try {
+          const newLabel = await createBoardLabel(
+            boardId,
+            name,
+            token,
+            colorIdx++,
+            signal
+          );
+          labelMap.set(name.toLowerCase().trim(), newLabel.id);
+          pushLog(
+            'success',
+            `Created board label "${name}" (${newLabel.color ?? 'default'})`
+          );
+        } catch (err) {
+          pushLog(
+            'warn',
+            `Could not create board label "${name}": ${
+              err instanceof Error ? err.message : String(err)
+            }`
+          );
+        }
+      }
+    }
+
+    // Assign resolved label IDs to updatePayload.idLabels for each card
+    for (const card of cards) {
+      if (card.updatePayload.labelNames) {
+        const finalIds: string[] = [];
+        for (const name of card.updatePayload.labelNames) {
+          const id = labelMap.get(name.toLowerCase().trim());
+          if (id) {
+            finalIds.push(id);
+          }
+        }
+        card.updatePayload.idLabels = Array.from(new Set(finalIds));
+      }
     }
   }
 
