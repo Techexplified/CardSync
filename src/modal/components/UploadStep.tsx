@@ -364,14 +364,15 @@ export function UploadStep({
                           <div className="cs-list-search-wrap">
                             <svg
                               className="cs-list-search-icon"
-                              width="13"
-                              height="13"
+                              width="14"
+                              height="14"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="currentColor"
                               strokeWidth="2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
+                              aria-hidden="true"
                             >
                               <circle cx="11" cy="11" r="8" />
                               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -382,6 +383,7 @@ export function UploadStep({
                               placeholder="Filter cards..."
                               value={cardSearch}
                               onChange={(e) => setCardSearch(e.target.value)}
+                              aria-label="Filter cards in this list"
                             />
                             {cardSearch && (
                               <button
@@ -389,6 +391,7 @@ export function UploadStep({
                                 className="cs-list-search-clear"
                                 onClick={() => setCardSearch('')}
                                 title="Clear filter"
+                                aria-label="Clear filter"
                               >
                                 ✕
                               </button>

@@ -396,67 +396,107 @@
 
 /* Search input insulated from Trello host styles */
 .cs-scope .cs-list-search-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  width: 220px;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: 195px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .cs-scope .cs-list-search-icon {
-  position: absolute;
-  left: 9px;
-  color: #626f86;
-  pointer-events: none;
-  z-index: 1;
+  position: absolute !important;
+  left: 9px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 14px !important;
+  height: 14px !important;
+  color: #626f86 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
 }
 
 .cs-scope input.cs-list-search-input,
 .cs-scope .cs-list-search-input {
   width: 100% !important;
   height: 32px !important;
-  padding: 0 26px 0 28px !important;
+  min-height: 0 !important;
+  max-height: 32px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 26px 0 29px !important;
   border-radius: 6px !important;
   border: 1px solid #dcdfe4 !important;
   background: #ffffff !important;
   color: #172b4d !important;
   font-size: 12px !important;
   font-family: inherit !important;
+  line-height: normal !important;
+  vertical-align: middle !important;
   box-shadow: none !important;
   outline: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.cs-scope input.cs-list-search-input:hover,
+.cs-scope .cs-list-search-input:hover {
+  border-color: #85b8ff !important;
 }
 
 .cs-scope input.cs-list-search-input:focus,
 .cs-scope .cs-list-search-input:focus {
   border-color: #0055cc !important;
+  background: #ffffff !important;
   box-shadow: 0 0 0 2px rgba(0, 85, 204, 0.2) !important;
 }
 
 .cs-scope input.cs-list-search-input::placeholder,
 .cs-scope .cs-list-search-input::placeholder {
   color: #626f86 !important;
+  opacity: 1 !important;
+  font-size: 12px !important;
 }
 
 .cs-scope .cs-list-search-clear {
-  position: absolute;
-  right: 6px;
-  background: transparent;
-  border: none;
-  color: #626f86;
-  font-size: 11px;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 3px;
-  z-index: 1;
+  position: absolute !important;
+  right: 6px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+  border: none !important;
+  color: #626f86 !important;
+  font-size: 11px !important;
+  cursor: pointer !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  margin: 0 !important;
 }
 
 .cs-scope .cs-list-search-clear:hover {
-  background: #ebecf0;
-  color: #172b4d;
+  background: #ebecf0 !important;
+  color: #172b4d !important;
 }
 
 /* Copy List Name Button */
 .cs-btn-copy-list {
   height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
   padding: 0 11px !important;
   font-size: 12px !important;
   font-weight: 500 !important;
@@ -465,6 +505,7 @@
   color: #172b4d !important;
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 6px !important;
   border-radius: 6px !important;
   cursor: pointer !important;
@@ -481,6 +522,10 @@
 .cs-drawer-close-btn {
   width: 32px !important;
   height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
   border-radius: 6px !important;
   border: 1px solid #dcdfe4 !important;
   background: #ffffff !important;
