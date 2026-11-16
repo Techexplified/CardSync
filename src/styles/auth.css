@@ -158,35 +158,47 @@
   max-width: 480px;
 }
 
-/* Connect Trello Account Button */
+/* Connect to Trello Button */
+.cs-scope a.cs-auth-btn-connect,
 .cs-scope .cs-auth-btn-connect {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 100%;
-  min-height: 46px;
-  padding: 0 28px;
+  width: auto;
+  min-width: 250px;
+  min-height: 48px;
+  padding: 0 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #0c66e4 0%, #0055cc 100%);
+  background: #0c66e4;
   color: #ffffff !important;
   font-size: 15px;
   font-weight: 700;
-  text-decoration: none;
+  text-decoration: none !important;
   cursor: pointer;
   border: 1px solid #0055cc;
-  box-shadow: 0 4px 14px rgba(12, 102, 228, 0.28);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  box-shadow: 0 4px 14px rgba(12, 102, 228, 0.3);
+  transition: all 0.15s ease;
 }
 
+.cs-scope a.cs-auth-btn-connect:hover,
 .cs-scope .cs-auth-btn-connect:hover {
   transform: translateY(-1px);
-  background: linear-gradient(135deg, #0055cc 0%, #0047b3 100%);
-  box-shadow: 0 6px 20px rgba(12, 102, 228, 0.38);
+  background: #0055cc;
+  border-color: #0047b3;
+  box-shadow: 0 6px 20px rgba(12, 102, 228, 0.4);
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
-.cs-scope .cs-auth-btn-connect:active {
-  transform: translateY(0);
+.cs-scope a.cs-auth-btn-connect:visited,
+.cs-scope .cs-auth-btn-connect:visited,
+.cs-scope a.cs-auth-btn-connect:active,
+.cs-scope .cs-auth-btn-connect:active,
+.cs-scope a.cs-auth-btn-connect:focus,
+.cs-scope .cs-auth-btn-connect:focus {
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 /* Authorizing / Waiting Alert Banner */
@@ -222,26 +234,6 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Footer Meta Notes */
-.cs-scope .cs-auth-footer-note {
-  font-size: 12px;
-  color: #6b778c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.cs-scope .cs-auth-footer-pill {
-  background: #f1f2f4;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 11px;
-  color: #44546f;
 }
 
 /* Mobile Responsiveness */

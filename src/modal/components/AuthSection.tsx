@@ -14,12 +14,12 @@ function TrelloIcon() {
       width="20"
       height="20"
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
       aria-hidden="true"
     >
-      <rect width="24" height="24" rx="4" fill="currentColor" />
-      <rect x="3.5" y="3.5" width="7" height="12" rx="1.5" fill="#ffffff" />
-      <rect x="13.5" y="3.5" width="7" height="8" rx="1.5" fill="#ffffff" />
+      <rect width="24" height="24" rx="4.5" fill="#ffffff" />
+      <rect x="4" y="4" width="6.5" height="11" rx="1.5" fill="#0c66e4" />
+      <rect x="13.5" y="4" width="6.5" height="7.5" rx="1.5" fill="#0c66e4" />
     </svg>
   );
 }
@@ -172,7 +172,7 @@ export function AuthSection({
           onClick={onAuthorizeStart}
         >
           <TrelloIcon />
-          Connect Trello Account ↗
+          <span>Connect to Trello ↗</span>
         </a>
 
         {/* Live waiting banner when authorization tab is open */}
@@ -186,16 +186,6 @@ export function AuthSection({
             </div>
           </div>
         )}
-
-        {/* Permissions & Expiration Meta */}
-        <div className="cs-auth-footer-note">
-          <span>Scope:</span>
-          <span className="cs-auth-footer-pill">read, write</span>
-          <span>&middot; Lifetime:</span>
-          <span className="cs-auth-footer-pill">30 days</span>
-          <span>&middot;</span>
-          <span>Instant one-click disconnect</span>
-        </div>
       </div>
     </section>
   );
