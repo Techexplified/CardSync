@@ -281,22 +281,41 @@ export function UploadStep({
                   {snapshot.lists.map((l) => {
                     const count = cardCountByList.get(l.id) ?? 0;
                     const isSelected = selectedListId === l.id;
+                    const isEmpty = count === 0;
                     return (
                       <button
                         key={l.id}
                         type="button"
-                        className={`cs-list-chip-btn ${isSelected ? 'cs-list-chip-active' : ''}`}
+                        className={`cs-list-chip-btn ${
+                          isSelected ? 'cs-list-chip-active' : isEmpty ? 'cs-list-chip-empty' : ''
+                        }`}
                         onClick={() => {
                           setSelectedListId(isSelected ? null : l.id);
                           setCardSearch('');
                         }}
                         title={`Click to view cards in "${l.name}"`}
                       >
-                        <span>📋</span>
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                        </svg>
                         <span>{l.name}</span>
                         <span
                           className={`cs-list-chip-count ${
-                            isSelected ? 'cs-list-chip-count-active' : ''
+                            isSelected
+                              ? 'cs-list-chip-count-active'
+                              : isEmpty
+                              ? 'cs-list-chip-count-zero'
+                              : ''
                           }`}
                         >
                           {count}
@@ -311,49 +330,132 @@ export function UploadStep({
                   <div className="cs-list-details-panel">
                     <div className="cs-list-details-header">
                       <div className="cs-list-details-title">
-                        <span style={{ fontSize: 16 }}>📋</span>
+                        <div className="cs-list-drawer-badge">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#0055cc"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                          </svg>
+                        </div>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <strong>{selectedList.name}</strong>
-                            <span className="cs-pill cs-pill-info">
+                            <span className="cs-list-title-text">{selectedList.name}</span>
+                            <span className="cs-list-count-badge">
                               {cardsInSelectedList.length} card
                               {cardsInSelectedList.length === 1 ? '' : 's'}
                             </span>
                           </div>
-                          <div className="cs-card-desc" style={{ fontSize: 11, marginTop: 2 }}>
-                            Copy any Card ID below into your CSV to update or move cards in-place
+                          <div className="cs-list-drawer-sub">
+                            Click any Card ID or &ldquo;Copy ID&rdquo; to paste directly into your spreadsheet
                           </div>
                         </div>
                       </div>
 
-                      <div className="cs-actions">
-                        {cardsInSelectedList.length > 3 && (
-                          <input
-                            type="text"
-                            className="cs-input cs-input-sm"
-                            placeholder="Search cards..."
-                            value={cardSearch}
-                            onChange={(e) => setCardSearch(e.target.value)}
-                            style={{ width: 140, height: 28, fontSize: 11.5 }}
-                          />
+                      <div className="cs-actions" style={{ alignItems: 'center' }}>
+                        {cardsInSelectedList.length > 2 && (
+                          <div className="cs-list-search-wrap">
+                            <svg
+                              className="cs-list-search-icon"
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="11" cy="11" r="8" />
+                              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                              type="text"
+                              className="cs-list-search-input"
+                              placeholder="Filter cards..."
+                              value={cardSearch}
+                              onChange={(e) => setCardSearch(e.target.value)}
+                            />
+                            {cardSearch && (
+                              <button
+                                type="button"
+                                className="cs-list-search-clear"
+                                onClick={() => setCardSearch('')}
+                                title="Clear filter"
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
                         )}
                         <button
                           type="button"
-                          className="cs-btn cs-btn-subtle cs-btn-sm"
+                          className={`cs-btn-copy-list ${copiedListName ? 'cs-btn-success' : ''}`}
                           onClick={() => void handleCopyListName(selectedList.name)}
                           title="Copy list name to clipboard for List Name column"
-                          style={{ height: 28, fontSize: 11.5 }}
                         >
-                          {copiedListName ? '✓ List Name Copied' : '📋 Copy List Name'}
+                          {copiedListName ? (
+                            <>
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                              </svg>
+                              <span>Copy List Name</span>
+                            </>
+                          )}
                         </button>
                         <button
                           type="button"
-                          className="cs-list-close-btn"
+                          className="cs-drawer-close-btn"
                           onClick={() => setSelectedListId(null)}
                           title="Close card inspector"
                           aria-label="Close"
                         >
-                          ✕
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
                         </button>
                       </div>
                     </div>
@@ -367,7 +469,7 @@ export function UploadStep({
                         No cards match &quot;{cardSearch}&quot;.
                       </div>
                     ) : (
-                      <div className="cs-table-wrap" style={{ maxHeight: 250 }}>
+                      <div className="cs-table-wrap" style={{ maxHeight: 260 }}>
                         <table className="cs-table">
                           <thead>
                             <tr>
@@ -382,51 +484,101 @@ export function UploadStep({
                               return (
                                 <tr key={card.id}>
                                   <td>
-                                    <div
-                                      style={{
-                                        fontWeight: 600,
-                                        color: 'var(--cs-text)',
-                                        lineHeight: 1.3,
-                                      }}
-                                    >
-                                      {card.name}
-                                    </div>
-                                    <div
-                                      style={{
-                                        display: 'flex',
-                                        gap: 6,
-                                        alignItems: 'center',
-                                        marginTop: 3,
-                                      }}
-                                    >
+                                    <div className="cs-card-table-title">{card.name}</div>
+                                    <div className="cs-card-meta-row">
                                       {card.idShort && (
-                                        <span className="cs-card-desc" style={{ fontSize: 11 }}>
+                                        <span className="cs-card-number-badge">
                                           #{card.idShort}
                                         </span>
                                       )}
                                       {card.due && (
-                                        <span className="cs-due-chip">
-                                          Due: {card.due.slice(0, 10)}
+                                        <span className="cs-card-due-badge">
+                                          <svg
+                                            width="10"
+                                            height="10"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                            <line x1="16" y1="2" x2="16" y2="6" />
+                                            <line x1="8" y1="2" x2="8" y2="6" />
+                                            <line x1="3" y1="10" x2="21" y2="10" />
+                                          </svg>
+                                          {card.due.slice(0, 10)}
                                         </span>
                                       )}
                                     </div>
                                   </td>
                                   <td>
-                                    <code className="cs-card-id-code" title={card.id}>
-                                      {card.id}
-                                    </code>
+                                    <button
+                                      type="button"
+                                      className="cs-card-id-pill"
+                                      onClick={() => void handleCopyCardId(card.id)}
+                                      title="Click to copy Card ID"
+                                    >
+                                      <code>{card.id}</code>
+                                      <svg
+                                        width="11"
+                                        height="11"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      >
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                      </svg>
+                                    </button>
                                   </td>
                                   <td style={{ textAlign: 'right' }}>
                                     <button
                                       type="button"
-                                      className={`cs-btn cs-btn-sm ${
-                                        isCopied ? 'cs-btn-success' : 'cs-btn-subtle'
+                                      className={`cs-copy-action-btn ${
+                                        isCopied ? 'cs-copy-action-copied' : ''
                                       }`}
                                       onClick={() => void handleCopyCardId(card.id)}
                                       title="Copy this Card ID to clipboard"
-                                      style={{ height: 26, padding: '0 10px', fontSize: 11 }}
                                     >
-                                      {isCopied ? '✓ Copied' : 'Copy ID'}
+                                      {isCopied ? (
+                                        <>
+                                          <svg
+                                            width="11"
+                                            height="11"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <polyline points="20 6 9 17 4 12" />
+                                          </svg>
+                                          <span>Copied!</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <svg
+                                            width="11"
+                                            height="11"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                          </svg>
+                                          <span>Copy ID</span>
+                                        </>
+                                      )}
                                     </button>
                                   </td>
                                 </tr>

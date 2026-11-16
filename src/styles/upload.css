@@ -215,20 +215,39 @@
   flex-wrap: wrap;
 }
 
+/* Custom Thin Scrollbar for Tables */
+.cs-scope .cs-table-wrap::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.cs-scope .cs-table-wrap::-webkit-scrollbar-track {
+  background: #f7f8f9;
+}
+
+.cs-scope .cs-table-wrap::-webkit-scrollbar-thumb {
+  background: #c1c7d0;
+  border-radius: 4px;
+}
+
+.cs-scope .cs-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: #8993a4;
+}
+
 /* Board Lists Chips */
 .cs-board-lists-bar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   margin-top: 14px;
-  padding-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--cs-border);
 }
 
 .cs-board-lists-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -241,7 +260,7 @@
 }
 
 .cs-board-lists-hint {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--cs-text-muted);
 }
 
@@ -255,8 +274,8 @@
 .cs-list-chip-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 7px;
+  padding: 5px 12px;
   border-radius: 6px;
   background: var(--cs-surface);
   border: 1px solid var(--cs-border);
@@ -272,6 +291,7 @@
   background: var(--cs-surface-subtle);
   border-color: #85b8ff;
   color: #0055cc;
+  transform: translateY(-1px);
 }
 
 .cs-list-chip-btn.cs-list-chip-active {
@@ -279,7 +299,11 @@
   color: #ffffff !important;
   border-color: #0055cc !important;
   font-weight: 600;
-  box-shadow: 0 2px 5px rgba(0, 85, 204, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 85, 204, 0.3) !important;
+}
+
+.cs-list-chip-empty {
+  opacity: 0.85;
 }
 
 .cs-list-chip-count {
@@ -288,17 +312,22 @@
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 5px;
+  padding: 0 6px;
   border-radius: 9px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   background: #ebecf0;
   color: #44546f;
   line-height: 1;
 }
 
+.cs-list-chip-count-zero {
+  background: #f4f5f7;
+  color: #8c9bab;
+}
+
 .cs-list-chip-count-active {
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.28) !important;
   color: #ffffff !important;
 }
 
@@ -308,83 +337,270 @@
   border: 1px solid #cce0ff;
   border-radius: 8px;
   margin-top: 10px;
-  padding: 12px 14px;
-  box-shadow: 0 2px 8px rgba(9, 30, 66, 0.06);
+  box-shadow: 0 4px 12px rgba(9, 30, 66, 0.07);
+  overflow: hidden;
 }
 
 .cs-list-details-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ebecf0;
+  padding: 12px 16px;
+  background: #f8faff;
+  border-bottom: 1px solid #ddecfe;
 }
 
 .cs-list-details-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.cs-list-close-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--cs-text-muted);
-  cursor: pointer;
+.cs-list-drawer-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #e9f2ff;
+  border: 1px solid #cce0ff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.cs-list-close-btn:hover {
-  background: #ebecf0;
-  color: var(--cs-text);
-  border-color: #dcdfe4;
+.cs-list-title-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #091e42;
 }
 
-.cs-card-id-code {
-  background: #f4f5f7;
-  border: 1px solid #dcdfe4;
-  padding: 2px 6px;
-  border-radius: 4px;
+.cs-list-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
   font-size: 11px;
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
-  color: #0055cc;
-  font-weight: 500;
-  user-select: all;
-}
-
-.cs-btn-success {
-  background: #e3fcef !important;
-  color: #006644 !important;
-  border-color: #a3e8cc !important;
   font-weight: 600;
+  background: #e9f2ff;
+  color: #0055cc;
+  border: 1px solid #cce0ff;
 }
 
-.cs-due-chip {
-  display: inline-block;
+.cs-list-drawer-sub {
+  font-size: 11.5px;
+  color: #44546f;
+  margin-top: 2px;
+}
+
+/* Search input insulated from Trello host styles */
+.cs-scope .cs-list-search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 220px;
+}
+
+.cs-scope .cs-list-search-icon {
+  position: absolute;
+  left: 9px;
+  color: #626f86;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cs-scope input.cs-list-search-input,
+.cs-scope .cs-list-search-input {
+  width: 100% !important;
+  height: 32px !important;
+  padding: 0 26px 0 28px !important;
+  border-radius: 6px !important;
+  border: 1px solid #dcdfe4 !important;
+  background: #ffffff !important;
+  color: #172b4d !important;
+  font-size: 12px !important;
+  font-family: inherit !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.cs-scope input.cs-list-search-input:focus,
+.cs-scope .cs-list-search-input:focus {
+  border-color: #0055cc !important;
+  box-shadow: 0 0 0 2px rgba(0, 85, 204, 0.2) !important;
+}
+
+.cs-scope input.cs-list-search-input::placeholder,
+.cs-scope .cs-list-search-input::placeholder {
+  color: #626f86 !important;
+}
+
+.cs-scope .cs-list-search-clear {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: #626f86;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  z-index: 1;
+}
+
+.cs-scope .cs-list-search-clear:hover {
+  background: #ebecf0;
+  color: #172b4d;
+}
+
+/* Copy List Name Button */
+.cs-btn-copy-list {
+  height: 32px !important;
+  padding: 0 11px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border: 1px solid #dcdfe4 !important;
+  background: #ffffff !important;
+  color: #172b4d !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.cs-btn-copy-list:hover {
+  background: #f4f5f7 !important;
+  border-color: #85b8ff !important;
+  color: #0055cc !important;
+}
+
+/* Close Button */
+.cs-drawer-close-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  border: 1px solid #dcdfe4 !important;
+  background: #ffffff !important;
+  color: #626f86 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.cs-drawer-close-btn:hover {
+  background: #ffeceb !important;
+  border-color: #f87168 !important;
+  color: #ae2e24 !important;
+}
+
+/* Table Card Details */
+.cs-card-table-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #172b4d;
+  line-height: 1.35;
+}
+
+.cs-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cs-card-number-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #626f86;
   background: #f4f5f7;
   border: 1px solid #ebecf0;
   border-radius: 3px;
   padding: 1px 5px;
-  font-size: 10.5px;
-  color: var(--cs-text-secondary);
+}
+
+.cs-card-due-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #44546f;
+  background: #f4f5f7;
+  border: 1px solid #ebecf0;
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+/* Interactive Card ID Pill (Middle Column) */
+.cs-card-id-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8f9fa;
+  border: 1px solid #dcdfe4;
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+  color: #0055cc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-card-id-pill:hover {
+  background: #e9f2ff;
+  border-color: #85b8ff;
+  color: #0044a3;
+}
+
+.cs-card-id-pill code {
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+/* Action Button: Copy ID */
+.cs-copy-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #f0f7ff;
+  color: #0055cc;
+  border: 1px solid #cce0ff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cs-copy-action-btn:hover {
+  background: #0055cc;
+  color: #ffffff;
+  border-color: #0055cc;
+}
+
+.cs-copy-action-btn.cs-copy-action-copied {
+  background: #e3fcef !important;
+  color: #006644 !important;
+  border-color: #a3e8cc !important;
 }
 
 .cs-list-empty {
-  padding: 18px;
+  padding: 24px;
   text-align: center;
-  color: var(--cs-text-muted);
-  font-size: 12px;
+  color: #626f86;
+  font-size: 12.5px;
   font-style: italic;
+  background: #ffffff;
 }
 
 /* Import Guidelines Grid */
